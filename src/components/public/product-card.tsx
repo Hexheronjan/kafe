@@ -201,20 +201,20 @@ export function ProductDetailDialog({
             exit={{ opacity: 0 }}
             onClick={onClose}
           />
-          <div className="fixed inset-0 z-[120] grid place-items-center p-4 pointer-events-none">
+          <div className="fixed inset-0 z-[120] flex items-end justify-center p-0 sm:items-center sm:p-4 pointer-events-none">
             <motion.div
               role="dialog"
               aria-modal
               aria-label={product.name}
-              className="pointer-events-auto grid w-full max-w-3xl overflow-hidden rounded-3xl border border-espresso/15 bg-cream shadow-2xl md:grid-cols-12"
-              initial={{ opacity: 0, scale: 0.96, y: 16 }}
+              className="pointer-events-auto grid max-h-[90dvh] w-full max-w-3xl overflow-y-auto rounded-t-3xl border border-espresso/15 bg-cream shadow-2xl sm:rounded-3xl md:grid-cols-12"
+              initial={{ opacity: 0, scale: 0.96, y: 24 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.96, y: 16 }}
+              exit={{ opacity: 0, scale: 0.96, y: 24 }}
               transition={{ duration: 0.4, ease: EASE }}
             >
               <motion.div
                 layoutId={`${layoutPrefix}-img-${product.slug}`}
-                className="relative aspect-[4/3.6] w-full bg-latte md:col-span-6 md:aspect-auto md:min-h-[440px]"
+                className="relative aspect-[16/10] w-full bg-latte sm:aspect-[4/3.6] md:col-span-6 md:aspect-auto md:min-h-[440px]"
               >
                 <ProductImage product={product} sizes="(max-width: 768px) 100vw, 420px" />
               </motion.div>

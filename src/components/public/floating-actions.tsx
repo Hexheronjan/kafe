@@ -3,7 +3,16 @@
 import { useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
-import { MessageCircle, Palette, RotateCcw, SlidersHorizontal, X, ShieldCheck } from "lucide-react";
+import {
+  CalendarCheck,
+  Coffee,
+  MessageCircle,
+  Palette,
+  RotateCcw,
+  ShieldCheck,
+  SlidersHorizontal,
+  X,
+} from "lucide-react";
 import { useDemoStore } from "@/lib/demo-store";
 import { EASE } from "@/lib/utils";
 
@@ -23,45 +32,69 @@ export function FloatingActions() {
 
   return (
     <>
-      {/* Tombol Kustomisasi Client (Live White-Label Demo) di kiri bawah */}
-      <div className="fixed bottom-20 left-4 z-[92] md:bottom-6 md:left-6">
+      {/* Tombol Kustomisasi Client (Hanya tampil mengambang di Desktop md+; di Mobile menyatu di Bottom Dock) */}
+      <div className="fixed bottom-6 left-6 z-[92] hidden md:block">
         <button
           onClick={() => setCustomizerOpen(true)}
           aria-label="Buka panel kustomisasi tema klien"
           className="flex items-center gap-2 rounded-full border border-espresso/15 bg-cream/95 px-4 py-3 text-xs font-semibold tracking-wider text-espresso uppercase shadow-xl backdrop-blur-md transition-all hover:-translate-y-0.5 hover:bg-espresso hover:text-cream"
         >
           <Palette size={15} strokeWidth={1.7} className="text-brand" />
-          <span className="hidden sm:inline">Kustomisasi Client</span>
+          <span>Kustomisasi Client</span>
         </button>
       </div>
 
-      {/* Tombol WhatsApp Mengambang di kanan bawah */}
+      {/* Tombol WhatsApp Mengambang (Hanya di Desktop md+; di Mobile menyatu di Bottom Dock) */}
       <a
         href={waHref}
         target="_blank"
         rel="noreferrer"
         aria-label="Chat WhatsApp Kafe"
-        className="fixed right-4 bottom-20 z-[92] flex h-12 items-center gap-2.5 rounded-full bg-espresso px-5 text-xs font-semibold tracking-wider text-cream uppercase shadow-xl transition-all hover:-translate-y-0.5 hover:bg-brand-ink md:right-6 md:bottom-6"
+        className="fixed right-6 bottom-6 z-[92] hidden h-12 items-center gap-2.5 rounded-full bg-espresso px-5 text-xs font-semibold tracking-wider text-cream uppercase shadow-xl transition-all hover:-translate-y-0.5 hover:bg-brand-ink md:flex"
       >
         <span className="relative h-2 w-2 rounded-full bg-[#5fbf6a] pulse-dot" />
         <MessageCircle size={17} strokeWidth={1.6} />
-        <span className="hidden sm:inline">WhatsApp</span>
+        <span>WhatsApp</span>
       </a>
 
-      {/* Sticky Bottom Bar untuk Mobile */}
-      <div className="fixed inset-x-0 bottom-0 z-[90] grid grid-cols-2 gap-2 border-t border-[var(--line)] bg-cream/95 p-2.5 backdrop-blur-xl md:hidden">
-        <Link href="/menu" className="btn btn-primary !min-h-[44px] !px-3 !text-[11px]">
-          {siteConfig.hero.ctaMenu}
-        </Link>
-        {siteConfig.features.reservationEnabled ? (
-          <Link href="/reservasi" className="btn btn-outline !min-h-[44px] !px-3 !text-[11px]">
-            {siteConfig.hero.ctaReserve}
+      {/* Unified Mobile Bottom Dock (Rapi, tidak bertumpuk di layar HP) */}
+      <div className="fixed inset-x-0 bottom-0 z-[90] border-t border-espresso/10 bg-cream/95 px-2.5 py-2 shadow-[0_-8px_24px_rgba(28,22,18,0.08)] backdrop-blur-xl md:hidden">
+        <div className="mx-auto grid max-w-md grid-cols-4 gap-1.5">
+          <Link
+            href="/menu"
+            className="flex flex-col items-center justify-center gap-0.5 rounded-2xl bg-espresso py-2 text-[10px] font-semibold text-cream"
+          >
+            <Coffee size={15} />
+            <span>Menu</span>
           </Link>
-        ) : (
-          <Link href="/cek-status" className="btn btn-outline !min-h-[44px] !px-3 !text-[11px]">
-            Cek Status
+
+          <Link
+            href={siteConfig.features.reservationEnabled ? "/reservasi" : "/cek-status"}
+            className="flex flex-col items-center justify-center gap-0.5 rounded-2xl border border-espresso/15 bg-white/80 py-2 text-[10px] font-semibold text-espresso"
+          >
+            <CalendarCheck size={15} className="text-brand-ink" />
+            <span>{siteConfig.features.reservationEnabled ? "Reservasi" : "Status"}</span>
           </Link>
-        )}
+
+          <button
+            type="button"
+            onClick={() => setCustomizerOpen(true)}
+            className="flex flex-col items-center justify-center gap-0.5 rounded-2xl border border-espresso/15 bg-white/80 py-2 text-[10px] font-semibold text-espresso"
+          >
+            <Palette size={15} className="text-brand" />
+            <span>Tema</span>
+          </button>
+
+          <a
+            href={waHref}
+            target="_blank"
+            rel="noreferrer"
+            className="flex flex-col items-center justify-center gap-0.5 rounded-2xl bg-[#246b3d] py-2 text-[10px] font-semibold text-white"
+          >
+            <MessageCircle size={15} />
+            <span>WhatsApp</span>
+          </a>
+        </div>
       </div>
 
       {/* Panel Kustomisasi Client (Simulasi White-Label untuk Pemilik Kafe) */}
@@ -69,7 +102,7 @@ export function FloatingActions() {
         {customizerOpen && (
           <>
             <motion.div
-              className="fixed inset-0 z-[115] bg-espresso/40 backdrop-blur-[2px]"
+              className="fixed inset-0 z-[115] bg-espresso/45 backdrop-blur-[2px]"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -79,13 +112,13 @@ export function FloatingActions() {
               role="dialog"
               aria-modal
               aria-label="Kustomisasi Identitas & Tema Kafe"
-              className="fixed bottom-0 left-0 z-[120] w-full max-w-md rounded-t-3xl border border-espresso/15 bg-cream p-6 shadow-2xl md:bottom-6 md:left-6 md:rounded-3xl"
+              className="fixed inset-x-0 bottom-0 z-[120] max-h-[86dvh] w-full max-w-md overflow-y-auto rounded-t-3xl border border-espresso/15 bg-cream p-5 shadow-2xl sm:p-6 md:bottom-6 md:left-6 md:rounded-3xl"
               initial={{ opacity: 0, y: 24, scale: 0.97 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 24, scale: 0.97 }}
               transition={{ duration: 0.35, ease: EASE }}
             >
-              <div className="flex items-start justify-between gap-4 border-b border-[var(--line)] pb-4">
+              <div className="flex items-start justify-between gap-4 border-b border-[var(--line)] pb-3.5">
                 <div>
                   <p className="eyebrow flex items-center gap-1.5">
                     <SlidersHorizontal size={12} /> Demo Produk Komersial
@@ -144,7 +177,10 @@ export function FloatingActions() {
                               : "border-[var(--line)] bg-white/70 hover:bg-latte"
                           }`}
                         >
-                          <span className="h-3.5 w-3.5 rounded-full border border-white/40" style={{ background: c.hex }} />
+                          <span
+                            className="h-3.5 w-3.5 rounded-full border border-white/40"
+                            style={{ background: c.hex }}
+                          />
                           {c.name.split(" ")[0]}
                         </button>
                       );
@@ -184,7 +220,7 @@ export function FloatingActions() {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between gap-2 border-t border-[var(--line)] pt-4">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-t border-[var(--line)] pt-4">
                   <button
                     type="button"
                     onClick={resetSiteConfig}

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Camera, Check, Copy, Mail, MapPin, MessageCircle, Navigation, Phone, Sparkles } from "lucide-react";
 import { hours } from "@/config/site";
 import { useDemoStore } from "@/lib/demo-store";
+import { formatPhoneID } from "@/lib/utils";
 import { Reveal, TextReveal } from "@/components/motion";
 import { OpenStatus } from "@/components/public/open-status";
 
@@ -74,7 +75,7 @@ export default function KontakPage() {
                     <Phone size={16} className="text-brand-ink" /> WhatsApp
                   </span>
                   <a href={waHref} target="_blank" rel="noreferrer" className="tabular font-semibold hover:text-brand-ink">
-                    +{siteConfig.whatsapp}
+                    {formatPhoneID(siteConfig.whatsapp)}
                   </a>
                 </li>
                 <li className="flex items-center justify-between border-b border-[var(--line)] pb-3">

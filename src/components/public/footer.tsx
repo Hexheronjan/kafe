@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowUpRight, Camera, Mail, MapPin, Phone, ShieldCheck } from "lucide-react";
 import { hours, nav } from "@/config/site";
 import { useDemoStore } from "@/lib/demo-store";
+import { formatPhoneID } from "@/lib/utils";
 import { OpenStatus } from "./open-status";
 
 export function Footer() {
@@ -102,7 +103,7 @@ export function Footer() {
               <li className="flex items-center gap-2.5">
                 <Phone size={16} strokeWidth={1.5} className="shrink-0 text-brand" />
                 <a href={waHref} target="_blank" rel="noreferrer" className="tabular hover:text-cream">
-                  +{siteConfig.whatsapp}
+                  {formatPhoneID(siteConfig.whatsapp)}
                 </a>
               </li>
               <li className="flex items-center gap-2.5">

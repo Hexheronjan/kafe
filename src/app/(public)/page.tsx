@@ -117,31 +117,31 @@ export default function HomePage() {
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(184,115,58,0.25),transparent_55%)]" />
         </motion.div>
 
-        <div className="container-x relative z-10 pt-32 pb-14 md:pb-20">
+        <div className="container-x relative z-10 pt-24 pb-10 md:pt-32 md:pb-20">
           {/* Floating status & location pills */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: EASE }}
-            className="flex flex-wrap items-center gap-3"
+            className="flex flex-wrap items-center gap-2 sm:gap-3"
           >
-            <span className="inline-flex items-center gap-2 rounded-full border border-cream/20 bg-cream/10 px-4 py-1.5 text-xs font-semibold tracking-[0.18em] text-cream uppercase backdrop-blur-md">
-              <Sparkles size={13} className="text-brand" />
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-cream/20 bg-cream/10 px-3 py-1 text-[10px] font-semibold tracking-[0.16em] text-cream uppercase backdrop-blur-md sm:px-4 sm:py-1.5 sm:text-xs">
+              <Sparkles size={12} className="text-brand" />
               {siteConfig.hero.eyebrow}
             </span>
-            <div className="rounded-full border border-cream/20 bg-espresso/45 px-4 py-1.5 backdrop-blur-md">
+            <div className="rounded-full border border-cream/20 bg-espresso/45 px-3 py-1 backdrop-blur-md sm:px-4 sm:py-1.5">
               <OpenStatus tone="light" />
             </div>
           </motion.div>
 
-          <div className="mt-8 grid items-end gap-10 lg:grid-cols-12">
+          <div className="mt-6 grid items-end gap-8 sm:mt-8 lg:grid-cols-12 lg:gap-10">
             <div className="lg:col-span-8">
               <TextReveal text={siteConfig.hero.headline} className="font-display t-hero text-cream" />
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, ease: EASE, delay: 0.28 }}
-                className="mt-6 max-w-2xl text-base leading-relaxed text-cream/85 md:text-lg"
+                className="mt-4 max-w-2xl text-sm leading-relaxed text-cream/85 sm:mt-6 sm:text-base md:text-lg"
               >
                 {siteConfig.hero.sub}
               </motion.p>
@@ -150,13 +150,13 @@ export default function HomePage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, ease: EASE, delay: 0.38 }}
-                className="mt-8 flex flex-wrap items-center gap-3.5"
+                className="mt-6 grid grid-cols-2 gap-2.5 sm:mt-8 sm:flex sm:flex-wrap sm:items-center sm:gap-3.5"
               >
-                <Link href="/menu" className="btn btn-brand">
-                  {siteConfig.hero.ctaMenu} <ArrowUpRight size={16} />
+                <Link href="/menu" className="btn btn-brand !px-4 sm:!px-7">
+                  {siteConfig.hero.ctaMenu} <ArrowUpRight size={15} />
                 </Link>
                 {siteConfig.features.reservationEnabled && (
-                  <Link href="/reservasi" className="btn btn-light">
+                  <Link href="/reservasi" className="btn btn-light !px-4 sm:!px-7">
                     {siteConfig.hero.ctaReserve}
                   </Link>
                 )}
@@ -167,21 +167,21 @@ export default function HomePage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.9, delay: 0.5 }}
-                className="mt-10 grid grid-cols-3 gap-4 border-t border-cream/15 pt-6 sm:max-w-xl"
+                className="mt-8 grid grid-cols-3 gap-3 border-t border-cream/15 pt-5 sm:mt-10 sm:max-w-xl sm:gap-4 sm:pt-6"
               >
                 <div>
-                  <p className="font-display flex items-center gap-1 text-2xl text-cream">
-                    4.9 <Star size={16} fill="currentColor" className="text-brand" />
+                  <p className="font-display flex items-center gap-1 text-xl text-cream sm:text-2xl">
+                    4.9 <Star size={14} fill="currentColor" className="text-brand" />
                   </p>
-                  <p className="text-xs text-cream/65">1.200+ Ulasan Tamu</p>
+                  <p className="text-[11px] text-cream/65 sm:text-xs">1.200+ Ulasan</p>
                 </div>
                 <div>
-                  <p className="font-display text-2xl text-cream">100%</p>
-                  <p className="text-xs text-cream/65">Arabica Sangrai Segar</p>
+                  <p className="font-display text-xl text-cream sm:text-2xl">100%</p>
+                  <p className="text-[11px] text-cream/65 sm:text-xs">Arabica Segar</p>
                 </div>
                 <div>
-                  <p className="font-display text-2xl text-cream">07:00</p>
-                  <p className="text-xs text-cream/65">Roti Pagi Keluar Oven</p>
+                  <p className="font-display text-xl text-cream sm:text-2xl">07:00</p>
+                  <p className="text-[11px] text-cream/65 sm:text-xs">Roti Pagi</p>
                 </div>
               </motion.div>
             </div>

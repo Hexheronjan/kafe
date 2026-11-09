@@ -4,7 +4,18 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, Eye, EyeOff, KeyRound, Lock, Mail, ShieldCheck, Sparkles } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  CheckCircle2,
+  Eye,
+  EyeOff,
+  Lock,
+  Mail,
+  ShieldCheck,
+  Sparkles,
+  UserCheck,
+} from "lucide-react";
 import { useDemoStore, type AdminUserSession } from "@/lib/demo-store";
 import { BLUR, cn } from "@/lib/utils";
 
@@ -18,11 +29,11 @@ const DEMO_ACCOUNTS: {
 }[] = [
   {
     role: "OWNER",
-    label: "Owner (Pemilik)",
+    label: "Owner (Pemilik Kafe)",
     name: "Hendrawan · Owner",
     email: "owner@prajalinks.id",
     pass: "PrajalinksPonorogo2026!",
-    desc: "Akses penuh: statistik pendapatan, menu, pesanan, reservasi & pengaturan white-label.",
+    desc: "Akses penuh: laporan pendapatan, menu, pesanan, reservasi & kustomisasi tema website.",
   },
   {
     role: "ADMIN",
@@ -30,15 +41,15 @@ const DEMO_ACCOUNTS: {
     name: "Nadia · Store Manager",
     email: "admin@prajalinks.id",
     pass: "AdminPonorogo2026!",
-    desc: "Kelola menu, verifikasi bukti transfer, pesanan harian & konfirmasi reservasi.",
+    desc: "Kelola katalog menu, verifikasi bukti transfer, pesanan harian & konfirmasi reservasi.",
   },
   {
     role: "STAFF",
-    label: "Staff Kasir",
+    label: "Staff Kasir & Barista",
     name: "Raka · Head Barista",
     email: "kasir@prajalinks.id",
     pass: "StaffPonorogo2026!",
-    desc: "Pantau antrean pesanan masuk, ubah status siap saji & cek ketersediaan menu.",
+    desc: "Pantau antrean pesanan masuk, ubah status siap saji & atur ketersediaan menu.",
   },
 ];
 
@@ -70,12 +81,58 @@ export function AdminLoginView({ onSuccess }: { onSuccess?: () => void }) {
       setLoading(false);
       if (onSuccess) onSuccess();
       else router.push("/admin");
-    }, 350);
+    }, 300);
   };
 
+  const activeAccount = DEMO_ACCOUNTS.find((a) => a.role === selectedRole) ?? DEMO_ACCOUNTS[0];
+
   return (
-    <div className="admin grid min-h-dvh lg:grid-cols-12">
-      {/* Kolom Kiri: Visual Branding Kafe */}
+    <div className="admin min-h-dvh lg:grid lg:grid-cols-12">
+      {/* Banner Visual Mobile (Hanya muncul di Mobile/Tablet agar tampilan tetap mewah) */}
+      <div className="relative overflow-hidden bg-[#1c1612] px-5 pt-5 pb-12 text-[#f6f0e7] lg:hidden">
+        <Image
+          src="/images/hero.jpg"
+          alt={siteConfig.name}
+          fill
+          sizes="100vw"
+          placeholder="blur"
+          blurDataURL={BLUR}
+          className="object-cover opacity-35"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1c1612]/60 via-[#1c1612]/75 to-[#1c1612]" />
+
+        <div className="relative z-10 flex items-center justify-between">
+          <Link href="/" className="inline-flex items-center gap-2">
+            <span className="grid h-8 w-8 place-items-center rounded-full bg-brand text-xs font-bold text-white">
+              {siteConfig.name.slice(0, 1)}
+            </span>
+            <span className="font-display text-xl">
+              {siteConfig.name}
+              <span className="text-brand">.</span>
+            </span>
+          </Link>
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-[11px] font-medium text-white backdrop-blur-md"
+          >
+            <ArrowLeft size={13} /> Website
+          </Link>
+        </div>
+
+        <div className="relative z-10 mt-6">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[10px] font-semibold tracking-wider uppercase backdrop-blur-md">
+            <Sparkles size={11} className="text-brand" /> Portal Pengelola · Ponorogo
+          </span>
+          <h1 className="font-display mt-2.5 text-2xl leading-snug sm:text-3xl">
+            Login Dashboard {siteConfig.name}
+          </h1>
+          <p className="mt-1 text-xs text-white/75">
+            Pilih akun role di bawah (otomatis terisi) lalu tekan Masuk.
+          </p>
+        </div>
+      </div>
+
+      {/* Kolom Kiri Desktop: Visual Branding Kafe */}
       <div className="relative hidden flex-col justify-between overflow-hidden bg-[#1c1612] p-12 text-[#f6f0e7] lg:col-span-5 lg:flex">
         <Image
           src="/images/hero.jpg"
@@ -88,7 +145,7 @@ export function AdminLoginView({ onSuccess }: { onSuccess?: () => void }) {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#1c1612] via-[#1c1612]/70 to-[#1c1612]/40" />
 
-        <div className="relative z-10">
+        <div className="relative z-10 flex items-center justify-between">
           <Link href="/" className="inline-flex items-center gap-2.5">
             <span className="grid h-9 w-9 place-items-center rounded-full bg-brand text-sm font-bold text-white">
               {siteConfig.name.slice(0, 1)}
@@ -97,6 +154,12 @@ export function AdminLoginView({ onSuccess }: { onSuccess?: () => void }) {
               {siteConfig.name}
               <span className="text-brand">.</span>
             </span>
+          </Link>
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3.5 py-1.5 text-xs font-medium text-white backdrop-blur-md hover:bg-white hover:text-[#1c1612]"
+          >
+            <ArrowLeft size={14} /> Kembali ke Website
           </Link>
         </div>
 
@@ -114,33 +177,35 @@ export function AdminLoginView({ onSuccess }: { onSuccess?: () => void }) {
 
         <div className="relative z-10 flex items-center justify-between border-t border-white/15 pt-5 text-xs text-white/60">
           <span>{siteConfig.name} · Ponorogo, Jawa Timur</span>
-          <span>JWT Session + Role Permission</span>
+          <span>+62 851-5195-1806</span>
         </div>
       </div>
 
-      {/* Kolom Kanan: Kartu Login Otomatis Terisi */}
-      <div className="grid place-items-center p-6 sm:p-10 lg:col-span-7">
-        <div className="w-full max-w-lg rounded-3xl border border-[#e4e0d8] bg-white p-7 shadow-[0_20px_50px_-20px_rgba(28,22,18,0.12)] sm:p-10">
+      {/* Kolom Kanan: Kartu Login Otomatis Terisi (Responsif Mobile & Desktop) */}
+      <div className=" -mt-6 px-4 pb-10 sm:px-8 lg:col-span-7 lg:mt-0 lg:grid lg:place-items-center lg:p-10">
+        <div className="relative z-20 mx-auto w-full max-w-lg rounded-3xl border border-[#e4e0d8] bg-white p-5 shadow-[0_20px_50px_-20px_rgba(28,22,18,0.16)] sm:p-8">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-[11px] font-semibold text-emerald-800">
-              <CheckCircle2 size={13} /> Kredensial Login Otomatis Terisi
+              <CheckCircle2 size={13} /> Login Otomatis Terisi
             </span>
-            <span className="text-xs font-medium text-stone-400">Ponorogo Edition</span>
+            <span className="text-[11px] font-medium text-stone-400">Ponorogo Edition</span>
           </div>
 
-          <h2 className="font-display mt-4 text-3xl text-[#1c1612]">
-            Masuk ke Dashboard {siteConfig.name}
-          </h2>
-          <p className="mt-1.5 text-xs leading-relaxed text-stone-500">
-            Email dan password sudah terisi otomatis untuk memudahkan demo. Pilih role di bawah atau langsung klik tombol <strong>Masuk ke Dashboard</strong>.
-          </p>
-
-          {/* Pemilih Role 1-Klik */}
-          <div className="mt-5">
-            <p className="text-[11px] font-semibold tracking-wider text-stone-500 uppercase">
-              Pilih Akun Role (Auto-Fill):
+          <div className="hidden lg:block">
+            <h2 className="font-display mt-3 text-3xl text-[#1c1612]">
+              Masuk ke Dashboard {siteConfig.name}
+            </h2>
+            <p className="mt-1 text-xs leading-relaxed text-stone-500">
+              Pilih salah satu akun di bawah untuk mengisi email & password secara otomatis.
             </p>
-            <div className="mt-2 grid grid-cols-3 gap-2">
+          </div>
+
+          {/* Pemilih Role Responsif (1 kolom rapi di mobile, 3 kolom di tablet/desktop) */}
+          <div className="mt-4">
+            <p className="text-[11px] font-bold tracking-wider text-stone-500 uppercase">
+              1. Pilih Akun Role (Auto-Fill):
+            </p>
+            <div className="mt-2.5 grid grid-cols-1 gap-2 sm:grid-cols-3">
               {DEMO_ACCOUNTS.map((acc) => {
                 const active = selectedRole === acc.role;
                 return (
@@ -149,33 +214,49 @@ export function AdminLoginView({ onSuccess }: { onSuccess?: () => void }) {
                     type="button"
                     onClick={() => selectPreset(acc)}
                     className={cn(
-                      "rounded-2xl border p-2.5 text-left text-xs transition-all",
+                      "flex items-center justify-between rounded-2xl border p-3 text-left transition-all sm:flex-col sm:items-start sm:justify-start",
                       active
-                        ? "border-[#1c1612] bg-[#1c1612] text-white shadow-sm"
-                        : "border-[#e4e0d8] bg-[#f8f7f4] text-stone-700 hover:bg-stone-100",
+                        ? "border-[#1c1612] bg-[#1c1612] text-white shadow-md"
+                        : "border-[#e4e0d8] bg-[#f8f7f4] text-stone-800 hover:bg-stone-100",
                     )}
                   >
-                    <span className="flex items-center justify-between font-bold">
-                      {acc.role}
-                      <KeyRound size={12} className={active ? "text-brand" : "text-stone-400"} />
-                    </span>
-                    <span className={cn("mt-0.5 block truncate text-[10px]", active ? "text-white/75" : "text-stone-500")}>
-                      {acc.label}
-                    </span>
+                    <div className="flex items-center gap-2.5 sm:w-full sm:justify-between">
+                      <span
+                        className={cn(
+                          "rounded-full px-2.5 py-0.5 text-[10px] font-bold tracking-wider uppercase",
+                          active ? "bg-brand text-white" : "bg-stone-200 text-stone-700",
+                        )}
+                      >
+                        {acc.role}
+                      </span>
+                      <UserCheck size={15} className={active ? "text-brand" : "text-stone-400"} />
+                    </div>
+                    <div className="text-right sm:mt-2 sm:text-left">
+                      <p className="text-xs font-bold leading-snug">{acc.label}</p>
+                      <p className={cn("text-[11px]", active ? "text-white/70" : "text-stone-500")}>
+                        {acc.email}
+                      </p>
+                    </div>
                   </button>
                 );
               })}
             </div>
-            <p className="mt-2 rounded-xl bg-[#f8f7f4] px-3 py-2 text-[11px] text-stone-600">
-              <ShieldCheck size={13} className="mr-1 inline text-brand-ink" />
-              {DEMO_ACCOUNTS.find((a) => a.role === selectedRole)?.desc}
-            </p>
+
+            <div className="mt-2.5 flex items-start gap-2 rounded-2xl border border-amber-200/80 bg-amber-50/70 px-3.5 py-2.5 text-xs text-stone-700">
+              <ShieldCheck size={15} className="mt-0.5 shrink-0 text-brand-ink" />
+              <span>
+                <strong className="text-stone-900">{activeAccount.name}:</strong> {activeAccount.desc}
+              </span>
+            </div>
           </div>
 
           <form onSubmit={handleLogin} className="mt-5 space-y-4 text-xs">
+            <p className="text-[11px] font-bold tracking-wider text-stone-500 uppercase">
+              2. Kredensial Terisi Otomatis:
+            </p>
             <div>
               <label htmlFor="adm-email" className="block font-semibold text-stone-700">
-                Email Admin (Otomatis Terisi)
+                Email Admin
               </label>
               <div className="relative mt-1.5">
                 <Mail size={15} className="absolute top-1/2 left-3.5 -translate-y-1/2 text-stone-400" />
@@ -192,7 +273,7 @@ export function AdminLoginView({ onSuccess }: { onSuccess?: () => void }) {
 
             <div>
               <label htmlFor="adm-pass" className="block font-semibold text-stone-700">
-                Password (Otomatis Terisi)
+                Password
               </label>
               <div className="relative mt-1.5">
                 <Lock size={15} className="absolute top-1/2 left-3.5 -translate-y-1/2 text-stone-400" />
@@ -218,23 +299,23 @@ export function AdminLoginView({ onSuccess }: { onSuccess?: () => void }) {
             <button
               type="submit"
               disabled={loading}
-              className="mt-2 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[#1c1612] text-xs font-semibold tracking-wider text-white uppercase shadow-md transition-all hover:bg-brand-ink"
+              className="mt-2 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[#1c1612] text-xs font-semibold tracking-wider text-white uppercase shadow-md transition-all hover:bg-brand-ink active:scale-[0.99]"
             >
               {loading ? (
                 "Memverifikasi Sesi…"
               ) : (
                 <>
-                  Masuk ke Dashboard Admin <ArrowRight size={15} />
+                  Masuk sebagai {selectedRole} <ArrowRight size={15} />
                 </>
               )}
             </button>
           </form>
 
-          <div className="mt-6 flex items-center justify-between border-t border-[#e4e0d8] pt-4 text-xs text-stone-500">
-            <Link href="/" className="font-medium hover:text-stone-900 hover:underline">
+          <div className="mt-5 flex flex-wrap items-center justify-between gap-2 border-t border-[#e4e0d8] pt-4 text-xs text-stone-500">
+            <Link href="/" className="font-semibold text-stone-700 hover:text-stone-900 hover:underline">
               ← Kembali ke Website Publik
             </Link>
-            <span>Proteksi Rate-Limit & Cookie HttpOnly</span>
+            <span className="text-[11px]">Sesi Aman · Role-Based Access</span>
           </div>
         </div>
       </div>

@@ -172,8 +172,8 @@ function CekStatusContent() {
                 type="button"
                 onClick={() => {
                   setCode("RSV-20261109-0007");
-                  setPhone("081234567890");
-                  runLookup("RSV-20261109-0007", "081234567890");
+                  setPhone("085151951806");
+                  runLookup("RSV-20261109-0007", "085151951806");
                 }}
                 className="rounded-full border border-espresso/15 bg-latte/65 px-3 py-1.5 font-semibold text-espresso hover:bg-latte"
               >

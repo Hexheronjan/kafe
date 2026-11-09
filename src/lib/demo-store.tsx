@@ -101,7 +101,7 @@ const INITIAL_RESERVATIONS: DemoReservation[] = [
   {
     reservationNumber: "RSV-20261109-0007",
     customerName: "Clarissa Wijaya",
-    customerPhone: "081234567890",
+    customerPhone: "085151951806",
     visitDate: "2026-11-10",
     visitTime: "16:00",
     guestCount: 6,
@@ -176,14 +176,14 @@ export function DemoStoreProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     try {
-      const savedSite = localStorage.getItem("prj-site-config-v2");
+      const savedSite = localStorage.getItem("prj-site-config-v3");
       // eslint-disable-next-line react-hooks/set-state-in-effect
       if (savedSite) setSiteConfig({ ...defaultSite, ...JSON.parse(savedSite) });
-      const savedMenu = localStorage.getItem("prj-menu-items-v2");
+      const savedMenu = localStorage.getItem("prj-menu-items-v3");
       if (savedMenu) setMenuItems(JSON.parse(savedMenu));
-      const savedOrders = localStorage.getItem("prj-orders-v2");
+      const savedOrders = localStorage.getItem("prj-orders-v3");
       if (savedOrders) setOrders(JSON.parse(savedOrders));
-      const savedRes = localStorage.getItem("prj-reservations-v2");
+      const savedRes = localStorage.getItem("prj-reservations-v3");
       if (savedRes) setReservations(JSON.parse(savedRes));
       const savedAdmin = sessionStorage.getItem("prj-admin-session");
       if (savedAdmin) setAdminSession(JSON.parse(savedAdmin));
@@ -196,14 +196,14 @@ export function DemoStoreProvider({ children }: { children: ReactNode }) {
     document.documentElement.style.setProperty("--brand", siteConfig.primaryColor);
     document.documentElement.style.setProperty("--brand-ink", darkenHex(siteConfig.primaryColor, 0.78));
     try {
-      localStorage.setItem("prj-site-config-v2", JSON.stringify(siteConfig));
+      localStorage.setItem("prj-site-config-v3", JSON.stringify(siteConfig));
     } catch {}
   }, [siteConfig, hydrated]);
 
   useEffect(() => {
     if (hydrated) {
       try {
-        localStorage.setItem("prj-menu-items-v2", JSON.stringify(menuItems));
+        localStorage.setItem("prj-menu-items-v3", JSON.stringify(menuItems));
       } catch {}
     }
   }, [menuItems, hydrated]);
@@ -211,7 +211,7 @@ export function DemoStoreProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (hydrated) {
       try {
-        localStorage.setItem("prj-orders-v2", JSON.stringify(orders));
+        localStorage.setItem("prj-orders-v3", JSON.stringify(orders));
       } catch {}
     }
   }, [orders, hydrated]);
@@ -219,7 +219,7 @@ export function DemoStoreProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (hydrated) {
       try {
-        localStorage.setItem("prj-reservations-v2", JSON.stringify(reservations));
+        localStorage.setItem("prj-reservations-v3", JSON.stringify(reservations));
       } catch {}
     }
   }, [reservations, hydrated]);
@@ -248,10 +248,10 @@ export function DemoStoreProvider({ children }: { children: ReactNode }) {
     setOrders(INITIAL_ORDERS);
     setReservations(INITIAL_RESERVATIONS);
     try {
-      localStorage.removeItem("prj-site-config-v2");
-      localStorage.removeItem("prj-menu-items-v2");
-      localStorage.removeItem("prj-orders-v2");
-      localStorage.removeItem("prj-reservations-v2");
+      localStorage.removeItem("prj-site-config-v3");
+      localStorage.removeItem("prj-menu-items-v3");
+      localStorage.removeItem("prj-orders-v3");
+      localStorage.removeItem("prj-reservations-v3");
     } catch {}
   }, []);
 

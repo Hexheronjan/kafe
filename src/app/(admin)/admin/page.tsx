@@ -17,6 +17,7 @@ import {
   Image as ImageIcon,
   LayoutDashboard,
   LogOut,
+  Menu as MenuIcon,
   MessageSquareQuote,
   Plus,
   Search,
@@ -124,6 +125,7 @@ export default function AdminDashboardPage() {
 
   const [tab, setTab] = useState<AdminTab>("dashboard");
   const [collapsed, setCollapsed] = useState(false);
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [globalSearch, setGlobalSearch] = useState("");
   const [selectedOrder, setSelectedOrder] = useState<DemoOrder | null>(null);
   const [rejectReasonInput, setRejectReasonInput] = useState("");
@@ -131,19 +133,18 @@ export default function AdminDashboardPage() {
     "identitas" | "tampilan" | "kontak" | "operasional" | "modul" | "pembayaran" | "seo"
   >("identitas");
 
-  // State tambah menu baru
   const [newMenuOpen, setNewMenuOpen] = useState(false);
   const [newName, setNewName] = useState("");
   const [newPrice, setNewPrice] = useState(32000);
   const [newCat, setNewCat] = useState("coffee");
   const [newDesc, setNewDesc] = useState("");
 
-  // Statistik utama
   const activeMenuCount = menuItems.filter((m) => m.available).length;
-  const pendingOrdersCount = orders.filter((o) => o.status === "PENDING" || o.paymentStatus === "PENDING_VERIFICATION").length;
+  const pendingOrdersCount = orders.filter(
+    (o) => o.status === "PENDING" || o.paymentStatus === "PENDING_VERIFICATION",
+  ).length;
   const pendingResCount = reservations.filter((r) => r.status === "PENDING").length;
 
-  // Pendapatan dihitung dari pesanan berstatus Selesai dengan pembayaran Lunas
   const realizedRevenue = useMemo(
     () =>
       orders
@@ -152,16 +153,16 @@ export default function AdminDashboardPage() {
     [orders],
   );
 
-  const navItems: { id: AdminTab; label: string; icon: typeof LayoutDashboard; badge?: number }[] = [
-    { id: "dashboard", label: "Dashboard Utama", icon: LayoutDashboard },
-    { id: "pesanan", label: "Pesanan Online", icon: ShoppingBag, badge: pendingOrdersCount },
-    { id: "reservasi", label: "Reservasi Meja", icon: CalendarCheck, badge: pendingResCount },
-    { id: "menu", label: "Manajemen Menu", icon: Coffee },
-    { id: "kategori", label: "Kategori Menu", icon: FolderKanban },
-    { id: "galeri", label: "Galeri Foto", icon: ImageIcon },
-    { id: "testimoni", label: "Testimoni", icon: MessageSquareQuote },
-    { id: "tentang", label: "Tentang Kami", icon: BookOpen },
-    { id: "pengaturan", label: "Pengaturan Website", icon: Settings },
+  const navItems: { id: AdminTab; label: string; shortLabel: string; icon: typeof LayoutDashboard; badge?: number }[] = [
+    { id: "dashboard", label: "Dashboard Utama", shortLabel: "Ringkasan", icon: LayoutDashboard },
+    { id: "pesanan", label: "Pesanan Online", shortLabel: "Pesanan", icon: ShoppingBag, badge: pendingOrdersCount },
+    { id: "reservasi", label: "Reservasi Meja", shortLabel: "Reservasi", icon: CalendarCheck, badge: pendingResCount },
+    { id: "menu", label: "Manajemen Menu", shortLabel: "Menu", icon: Coffee },
+    { id: "kategori", label: "Kategori Menu", shortLabel: "Kategori", icon: FolderKanban },
+    { id: "galeri", label: "Galeri Foto", shortLabel: "Galeri", icon: ImageIcon },
+    { id: "testimoni", label: "Testimoni", shortLabel: "Testimoni", icon: MessageSquareQuote },
+    { id: "tentang", label: "Tentang Kami", shortLabel: "Tentang", icon: BookOpen },
+    { id: "pengaturan", label: "Pengaturan Website", shortLabel: "Pengaturan", icon: Settings },
   ];
 
   const handleAddMenu = (e: React.FormEvent) => {
@@ -187,18 +188,17 @@ export default function AdminDashboardPage() {
     setNewMenuOpen(false);
   };
 
-  // Jika belum login, tampilkan halaman Login Admin yang otomatis terisi
   if (!adminSession) {
     return <AdminLoginView />;
   }
 
   return (
-    <div className="admin flex min-h-dvh">
-      {/* SIDEBAR BISA DILIPAT */}
+    <div className="admin flex min-h-dvh pb-16 lg:pb-0">
+      {/* SIDEBAR DESKTOP (Hanya tampil di layar lg ke atas) */}
       <aside
         className={cn(
-          "sticky top-0 flex h-dvh shrink-0 flex-col justify-between border-r border-[#e4e0d8] bg-white transition-[width] duration-300",
-          collapsed ? "w-[72px]" : "w-64",
+          "sticky top-0 hidden h-dvh shrink-0 flex-col justify-between border-r border-[#e4e0d8] bg-white transition-[width] duration-300 lg:flex",
+          collapsed ? "w-[76px]" : "w-64",
         )}
       >
         <div>
@@ -209,20 +209,20 @@ export default function AdminDashboardPage() {
                   {siteConfig.name}
                   <span className="text-brand">.</span>
                 </p>
-                <p className="text-[10px] tracking-widest text-stone-500 uppercase">Admin Workspace</p>
+                <p className="text-[10px] tracking-widest text-stone-500 uppercase">Admin Ponorogo</p>
               </div>
             )}
             <button
               type="button"
               onClick={() => setCollapsed((c) => !c)}
               aria-label={collapsed ? "Perlebar sidebar" : "Lipat sidebar"}
-              className="grid h-9 w-9 place-items-center rounded border border-[#e4e0d8] text-stone-600 hover:bg-stone-100"
+              className="grid h-9 w-9 place-items-center rounded-xl border border-[#e4e0d8] text-stone-600 hover:bg-stone-100"
             >
               {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
             </button>
           </div>
 
-          <nav aria-label="Menu Admin" className="p-2.5 space-y-1">
+          <nav aria-label="Menu Admin" className="space-y-1 p-2.5">
             {navItems.map((item) => {
               const Icon = item.icon;
               const active = tab === item.id;
@@ -233,10 +233,8 @@ export default function AdminDashboardPage() {
                   onClick={() => setTab(item.id)}
                   title={collapsed ? item.label : undefined}
                   className={cn(
-                    "flex w-full items-center justify-between rounded px-3 py-2.5 text-left text-xs font-medium transition-colors",
-                    active
-                      ? "bg-[#1c1612] text-white"
-                      : "text-stone-700 hover:bg-stone-100",
+                    "flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-xs font-medium transition-colors",
+                    active ? "bg-[#1c1612] text-white" : "text-stone-700 hover:bg-stone-100",
                   )}
                 >
                   <span className="flex items-center gap-3 truncate">
@@ -254,10 +252,10 @@ export default function AdminDashboardPage() {
           </nav>
         </div>
 
-        <div className="border-t border-[#e4e0d8] p-3 space-y-1.5">
+        <div className="space-y-1.5 border-t border-[#e4e0d8] p-3">
           <Link
             href="/"
-            className="flex items-center gap-2.5 rounded px-3 py-2 text-xs font-semibold text-stone-700 hover:bg-stone-100"
+            className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-stone-700 hover:bg-stone-100"
           >
             <ExternalLink size={15} className="shrink-0" />
             {!collapsed && <span>Lihat Website Publik</span>}
@@ -265,7 +263,7 @@ export default function AdminDashboardPage() {
           <button
             type="button"
             onClick={logoutAdmin}
-            className="flex w-full items-center gap-2.5 rounded px-3 py-2 text-left text-xs text-rose-700 hover:bg-rose-50"
+            className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-xs font-semibold text-rose-700 hover:bg-rose-50"
           >
             <LogOut size={15} className="shrink-0" />
             {!collapsed && <span>Keluar (Logout)</span>}
@@ -273,132 +271,250 @@ export default function AdminDashboardPage() {
         </div>
       </aside>
 
-      {/* AREA KONTEN UTAMA */}
-      <div className="flex flex-1 flex-col min-w-0">
-        {/* Header dengan Breadcrumb, Pencarian Global & Badge Notifikasi */}
-        <header className="sticky top-0 z-20 flex h-16 items-center justify-between gap-4 border-b border-[#e4e0d8] bg-white px-6">
-          <div className="flex items-center gap-2 text-xs text-stone-500">
-            <span>Admin</span>
-            <span>/</span>
-            <span className="font-semibold text-stone-900 capitalize">{tab}</span>
-          </div>
+      {/* DRAWER SIDEBAR MOBILE */}
+      {mobileDrawerOpen && (
+        <div className="fixed inset-0 z-50 flex lg:hidden">
+          <div
+            className="fixed inset-0 bg-black/50 backdrop-blur-xs"
+            onClick={() => setMobileDrawerOpen(false)}
+          />
+          <aside className="relative z-10 flex h-full w-72 max-w-[82vw] flex-col justify-between bg-white p-4 shadow-2xl">
+            <div>
+              <div className="flex items-center justify-between border-b border-[#e4e0d8] pb-3">
+                <div>
+                  <p className="font-display text-xl font-semibold text-[#1c1612]">
+                    {siteConfig.name}
+                    <span className="text-brand">.</span>
+                  </p>
+                  <p className="text-[11px] text-stone-500">{adminSession.name}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setMobileDrawerOpen(false)}
+                  aria-label="Tutup menu"
+                  className="grid h-9 w-9 place-items-center rounded-full bg-stone-100"
+                >
+                  <X size={17} />
+                </button>
+              </div>
 
-          <div className="flex items-center gap-3">
-            <div className="relative hidden sm:block">
-              <Search size={14} className="absolute top-1/2 left-3 -translate-y-1/2 text-stone-400" />
-              <input
-                type="search"
-                value={globalSearch}
-                onChange={(e) => setGlobalSearch(e.target.value)}
-                placeholder="Cari nomor pesanan, menu, pelanggan…"
-                className="h-9 w-64 rounded border border-[#e4e0d8] bg-[#f8f7f4] pr-3 pl-8 text-xs focus:border-stone-800 focus:outline-none"
-              />
+              <nav className="mt-3 space-y-1">
+                {navItems.map((item) => {
+                  const Icon = item.icon;
+                  const active = tab === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => {
+                        setTab(item.id);
+                        setMobileDrawerOpen(false);
+                      }}
+                      className={cn(
+                        "flex w-full items-center justify-between rounded-xl px-3.5 py-2.5 text-left text-xs font-semibold",
+                        active ? "bg-[#1c1612] text-white" : "text-stone-700 hover:bg-stone-100",
+                      )}
+                    >
+                      <span className="flex items-center gap-3">
+                        <Icon size={17} />
+                        {item.label}
+                      </span>
+                      {item.badge !== undefined && item.badge > 0 && (
+                        <span className="rounded-full bg-amber-500 px-2 py-0.5 text-[10px] font-bold text-white">
+                          {item.badge}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </nav>
             </div>
 
-            <button
-              type="button"
-              onClick={() => setTab("pesanan")}
-              aria-label="Notifikasi pesanan dan reservasi baru"
-              className="relative flex h-9 items-center gap-1.5 rounded border border-[#e4e0d8] bg-[#f8f7f4] px-3 text-xs font-medium text-stone-700 hover:bg-stone-100"
-            >
-              <Bell size={14} />
-              <span className="hidden md:inline">Antrean Baru</span>
-              {pendingOrdersCount + pendingResCount > 0 && (
-                <span className="rounded-full bg-amber-500 px-1.5 py-0.2 text-[10px] font-bold text-white">
-                  {pendingOrdersCount + pendingResCount}
-                </span>
-              )}
-            </button>
+            <div className="space-y-1.5 border-t border-[#e4e0d8] pt-3">
+              <Link
+                href="/"
+                className="flex items-center gap-2.5 rounded-xl bg-stone-100 px-3.5 py-2.5 text-xs font-semibold text-stone-800"
+              >
+                <ExternalLink size={15} /> Lihat Website Publik
+              </Link>
+              <button
+                type="button"
+                onClick={logoutAdmin}
+                className="flex w-full items-center gap-2.5 rounded-xl bg-rose-50 px-3.5 py-2.5 text-left text-xs font-semibold text-rose-700"
+              >
+                <LogOut size={15} /> Keluar dari Sesi ({adminSession.role})
+              </button>
+            </div>
+          </aside>
+        </div>
+      )}
 
-            <div className="hidden items-center gap-2 border-l border-[#e4e0d8] pl-3 text-xs lg:flex">
-              <span className="grid h-7 w-7 place-items-center rounded-full bg-[#1c1612] text-[11px] font-bold text-white">
-                {adminSession.role.slice(0, 2)}
-              </span>
-              <div>
-                <p className="font-semibold leading-none text-stone-900">{adminSession.name}</p>
-                <p className="text-[10px] text-stone-500">Role: {adminSession.role}</p>
+      {/* AREA KONTEN UTAMA */}
+      <div className="flex min-w-0 flex-1 flex-col">
+        {/* Header Responsif */}
+        <header className="sticky top-0 z-20 border-b border-[#e4e0d8] bg-white">
+          <div className="flex h-14 items-center justify-between gap-2 px-4 sm:h-16 sm:px-6">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <button
+                type="button"
+                onClick={() => setMobileDrawerOpen(true)}
+                aria-label="Buka menu navigasi admin"
+                className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-[#e4e0d8] text-stone-700 lg:hidden"
+              >
+                <MenuIcon size={17} />
+              </button>
+              <div className="min-w-0">
+                <p className="truncate text-xs font-bold text-stone-900 sm:text-sm capitalize">
+                  {navItems.find((n) => n.id === tab)?.label ?? tab}
+                </p>
+                <p className="truncate text-[10px] text-stone-500">
+                  {siteConfig.name} Ponorogo · Role: {adminSession.role}
+                </p>
               </div>
             </div>
+
+            <div className="flex items-center gap-2">
+              <div className="relative hidden md:block">
+                <Search size={14} className="absolute top-1/2 left-3 -translate-y-1/2 text-stone-400" />
+                <input
+                  type="search"
+                  value={globalSearch}
+                  onChange={(e) => setGlobalSearch(e.target.value)}
+                  placeholder="Cari pesanan, menu, pelanggan…"
+                  className="h-9 w-56 rounded-full border border-[#e4e0d8] bg-[#f8f7f4] pr-3 pl-8 text-xs focus:border-stone-800 focus:outline-none"
+                />
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setTab("pesanan")}
+                aria-label="Notifikasi pesanan dan reservasi baru"
+                className="relative flex h-9 items-center gap-1.5 rounded-full border border-[#e4e0d8] bg-[#f8f7f4] px-3 text-xs font-medium text-stone-700 hover:bg-stone-100"
+              >
+                <Bell size={14} />
+                <span className="hidden sm:inline">Antrean</span>
+                {pendingOrdersCount + pendingResCount > 0 && (
+                  <span className="rounded-full bg-amber-500 px-1.5 py-0.2 text-[10px] font-bold text-white">
+                    {pendingOrdersCount + pendingResCount}
+                  </span>
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={logoutAdmin}
+                title="Logout"
+                className="flex h-9 items-center gap-1.5 rounded-full border border-rose-200 bg-rose-50 px-3 text-xs font-semibold text-rose-700 hover:bg-rose-100"
+              >
+                <LogOut size={13} />
+                <span className="hidden sm:inline">Logout</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Baris Tab Horizontal Scroll untuk Mobile/Tablet */}
+          <div className="no-scrollbar flex items-center gap-1.5 overflow-x-auto border-t border-[#e4e0d8] bg-[#faf9f6] px-4 py-2 lg:hidden">
+            {navItems.map((item) => {
+              const active = tab === item.id;
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => setTab(item.id)}
+                  className={cn(
+                    "shrink-0 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors",
+                    active
+                      ? "bg-[#1c1612] text-white"
+                      : "border border-[#e4e0d8] bg-white text-stone-700",
+                  )}
+                >
+                  {item.shortLabel}
+                  {item.badge !== undefined && item.badge > 0 && (
+                    <span className="ml-1.5 rounded-full bg-amber-500 px-1.5 py-0.2 text-[10px] text-white">
+                      {item.badge}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
           </div>
         </header>
 
-        <main className="flex-1 p-6 space-y-6">
+        <main className="flex-1 space-y-5 p-4 sm:p-6">
           {/* 1. DASHBOARD UTAMA */}
           {tab === "dashboard" && (
             <>
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-                <div className="rounded border border-[#e4e0d8] bg-white p-4">
-                  <p className="text-xs text-stone-500">Total Menu Aktif</p>
-                  <p className="tabular mt-2 text-2xl font-bold text-stone-900">
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+                <div className="rounded-2xl border border-[#e4e0d8] bg-white p-4">
+                  <p className="text-xs text-stone-500">Menu Aktif</p>
+                  <p className="tabular mt-1.5 text-xl font-bold text-stone-900 sm:text-2xl">
                     {activeMenuCount} <span className="text-xs font-normal text-stone-400">/ {menuItems.length}</span>
                   </p>
                 </div>
-                <div className="rounded border border-[#e4e0d8] bg-white p-4">
+                <div className="rounded-2xl border border-[#e4e0d8] bg-white p-4">
                   <p className="text-xs text-stone-500">Total Pesanan</p>
-                  <p className="tabular mt-2 text-2xl font-bold text-stone-900">{orders.length + 312}</p>
+                  <p className="tabular mt-1.5 text-xl font-bold text-stone-900 sm:text-2xl">{orders.length + 312}</p>
                 </div>
-                <div className="rounded border border-[#e4e0d8] bg-white p-4">
+                <div className="rounded-2xl border border-[#e4e0d8] bg-white p-4">
                   <p className="text-xs text-stone-500">Total Reservasi</p>
-                  <p className="tabular mt-2 text-2xl font-bold text-stone-900">{reservations.length + 48}</p>
+                  <p className="tabular mt-1.5 text-xl font-bold text-stone-900 sm:text-2xl">{reservations.length + 48}</p>
                 </div>
-                <div className="rounded border border-[#e4e0d8] bg-white p-4">
+                <div className="rounded-2xl border border-[#e4e0d8] bg-white p-4">
                   <p className="text-xs text-stone-500">Pesanan Hari Ini</p>
-                  <p className="tabular mt-2 text-2xl font-bold text-stone-900">{orders.length + 24}</p>
+                  <p className="tabular mt-1.5 text-xl font-bold text-stone-900 sm:text-2xl">{orders.length + 24}</p>
                 </div>
-                <div className="rounded border border-[#e4e0d8] bg-white p-4">
+                <div className="col-span-2 rounded-2xl border border-[#e4e0d8] bg-white p-4 sm:col-span-1">
                   <div className="flex items-center justify-between">
                     <p className="text-xs text-stone-500">Pendapatan</p>
                     <span
                       title="Pendapatan dihitung hanya dari pesanan berstatus Selesai dengan pembayaran Lunas."
-                      className="inline-flex cursor-help items-center gap-1 text-[10px] text-stone-400"
+                      className="inline-flex items-center gap-1 text-[10px] text-stone-400"
                     >
-                      <HelpCircle size={13} /> Selesai & Lunas
+                      <HelpCircle size={12} /> Selesai & Lunas
                     </span>
                   </div>
-                  <p className="tabular mt-2 text-xl font-bold text-emerald-700">{rupiah(realizedRevenue)}</p>
+                  <p className="tabular mt-1.5 text-xl font-bold text-emerald-700">{rupiah(realizedRevenue)}</p>
                 </div>
               </div>
 
               {/* Grafik 7 Hari Terakhir & Komposisi Penjualan */}
-              <div className="grid gap-6 lg:grid-cols-12">
-                <div className="rounded border border-[#e4e0d8] bg-white p-5 lg:col-span-8">
+              <div className="grid gap-5 lg:grid-cols-12">
+                <div className="rounded-2xl border border-[#e4e0d8] bg-white p-4 sm:p-5 lg:col-span-8">
                   <div className="flex items-center justify-between">
                     <div>
                       <h2 className="text-sm font-semibold text-stone-900">
                         Tren Pendapatan & Pesanan (7 Hari Terakhir)
                       </h2>
-                      <p className="text-xs text-stone-500">
-                        Pesanan berstatus Selesai & pembayaran Lunas
-                      </p>
+                      <p className="text-xs text-stone-500">Pesanan berstatus Selesai & pembayaran Lunas</p>
                     </div>
                     <BarChart3 size={18} className="text-stone-400" />
                   </div>
 
-                  <div className="mt-6 grid grid-cols-7 items-end gap-3 h-44 pt-4 border-b border-[#e4e0d8]">
+                  <div className="mt-5 grid h-40 grid-cols-7 items-end gap-2 border-b border-[#e4e0d8] pt-4 sm:h-44 sm:gap-3">
                     {WEEKLY_DATA.map((d) => {
                       const heightPct = Math.round((d.revenue / 3300000) * 100);
                       return (
-                        <div key={d.day} className="flex h-full flex-col items-center justify-end gap-2">
-                          <span className="tabular text-[10px] font-medium text-stone-500">
-                            {d.orders} psn
+                        <div key={d.day} className="flex h-full flex-col items-center justify-end gap-1.5">
+                          <span className="tabular text-[9px] font-medium text-stone-500 sm:text-[10px]">
+                            {d.orders}
                           </span>
                           <div
                             style={{ height: `${heightPct}%` }}
-                            className="w-full max-w-[42px] rounded-t bg-[#1c1612] transition-all hover:bg-brand"
+                            className="w-full max-w-[38px] rounded-t-lg bg-[#1c1612] transition-all hover:bg-brand"
                             title={`${d.day}: ${rupiah(d.revenue)}`}
                           />
                         </div>
                       );
                     })}
                   </div>
-                  <div className="mt-2 grid grid-cols-7 text-center text-xs font-medium text-stone-600">
+                  <div className="mt-2 grid grid-cols-7 text-center text-[11px] font-medium text-stone-600">
                     {WEEKLY_DATA.map((d) => (
                       <span key={d.day}>{d.day}</span>
                     ))}
                   </div>
                 </div>
 
-                <div className="rounded border border-[#e4e0d8] bg-white p-5 lg:col-span-4">
+                <div className="rounded-2xl border border-[#e4e0d8] bg-white p-4 sm:p-5 lg:col-span-4">
                   <h2 className="text-sm font-semibold text-stone-900">Komposisi Kategori</h2>
                   <p className="text-xs text-stone-500">Proporsi penjualan per kategori menu</p>
                   <div className="mt-5 space-y-3.5 text-xs">
@@ -413,7 +529,7 @@ export default function AdminDashboardPage() {
                           <span>{c.name}</span>
                           <span className="tabular">{c.pct}%</span>
                         </div>
-                        <div className="mt-1.5 h-2 w-full rounded-full bg-stone-100 overflow-hidden">
+                        <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-stone-100">
                           <div className={`h-full ${c.color}`} style={{ width: `${c.pct}%` }} />
                         </div>
                       </div>
@@ -422,10 +538,10 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
 
-              {/* Pesanan & Reservasi Terbaru dengan Aksi Cepat */}
-              <div className="grid gap-6 lg:grid-cols-2">
-                <div className="rounded border border-[#e4e0d8] bg-white p-5">
-                  <div className="flex items-center justify-between mb-4">
+              {/* Pesanan & Reservasi Terbaru */}
+              <div className="grid gap-5 lg:grid-cols-2">
+                <div className="rounded-2xl border border-[#e4e0d8] bg-white p-4 sm:p-5">
+                  <div className="mb-3 flex items-center justify-between">
                     <h2 className="text-sm font-semibold text-stone-900">Pesanan Terbaru</h2>
                     <button
                       type="button"
@@ -437,7 +553,7 @@ export default function AdminDashboardPage() {
                   </div>
                   <div className="divide-y divide-[#e4e0d8] text-xs">
                     {orders.slice(0, 4).map((o) => (
-                      <div key={o.orderNumber} className="flex items-center justify-between py-3 gap-2">
+                      <div key={o.orderNumber} className="flex flex-wrap items-center justify-between gap-2 py-3">
                         <div>
                           <p className="tabular font-semibold text-stone-900">{o.orderNumber}</p>
                           <p className="text-stone-500">
@@ -445,7 +561,12 @@ export default function AdminDashboardPage() {
                           </p>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className={cn("border px-2 py-0.5 text-[10px] font-semibold rounded", statusBadgeClass(o.status))}>
+                          <span
+                            className={cn(
+                              "rounded-full border px-2.5 py-0.5 text-[10px] font-semibold",
+                              statusBadgeClass(o.status),
+                            )}
+                          >
                             {statusLabelID(o.status, o.orderType)}
                           </span>
                           <button
@@ -454,7 +575,7 @@ export default function AdminDashboardPage() {
                               setSelectedOrder(o);
                               setTab("pesanan");
                             }}
-                            className="rounded border border-[#e4e0d8] px-2.5 py-1 font-medium hover:bg-stone-100"
+                            className="rounded-full border border-[#e4e0d8] px-3 py-1 font-medium hover:bg-stone-100"
                           >
                             Detail
                           </button>
@@ -464,8 +585,8 @@ export default function AdminDashboardPage() {
                   </div>
                 </div>
 
-                <div className="rounded border border-[#e4e0d8] bg-white p-5">
-                  <div className="flex items-center justify-between mb-4">
+                <div className="rounded-2xl border border-[#e4e0d8] bg-white p-4 sm:p-5">
+                  <div className="mb-3 flex items-center justify-between">
                     <h2 className="text-sm font-semibold text-stone-900">Reservasi Terbaru</h2>
                     <button
                       type="button"
@@ -477,7 +598,7 @@ export default function AdminDashboardPage() {
                   </div>
                   <div className="divide-y divide-[#e4e0d8] text-xs">
                     {reservations.slice(0, 4).map((r) => (
-                      <div key={r.reservationNumber} className="flex items-center justify-between py-3 gap-2">
+                      <div key={r.reservationNumber} className="flex flex-wrap items-center justify-between gap-2 py-3">
                         <div>
                           <p className="tabular font-semibold text-stone-900">{r.reservationNumber}</p>
                           <p className="text-stone-500">
@@ -485,7 +606,12 @@ export default function AdminDashboardPage() {
                           </p>
                         </div>
                         <div className="flex items-center gap-1.5">
-                          <span className={cn("border px-2 py-0.5 text-[10px] font-semibold rounded", statusBadgeClass(r.status))}>
+                          <span
+                            className={cn(
+                              "rounded-full border px-2.5 py-0.5 text-[10px] font-semibold",
+                              statusBadgeClass(r.status),
+                            )}
+                          >
                             {r.status}
                           </span>
                           {r.status === "PENDING" && (
@@ -498,7 +624,7 @@ export default function AdminDashboardPage() {
                                   "Dikonfirmasi cepat dari dashboard.",
                                 )
                               }
-                              className="rounded bg-emerald-700 px-2 py-1 text-[10px] font-semibold text-white hover:bg-emerald-800"
+                              className="rounded-full bg-emerald-700 px-2.5 py-1 text-[10px] font-semibold text-white hover:bg-emerald-800"
                             >
                               Terima
                             </button>
@@ -514,14 +640,53 @@ export default function AdminDashboardPage() {
 
           {/* 2. MANAJEMEN PESANAN & VERIFIKASI BUKTI TRANSFER */}
           {tab === "pesanan" && (
-            <div className="grid gap-6 lg:grid-cols-12">
-              <div className="rounded border border-[#e4e0d8] bg-white p-5 lg:col-span-7">
+            <div className="grid gap-5 lg:grid-cols-12">
+              <div className="rounded-2xl border border-[#e4e0d8] bg-white p-4 sm:p-5 lg:col-span-7">
                 <h2 className="text-base font-semibold text-stone-900">Manajemen Pesanan Online</h2>
                 <p className="text-xs text-stone-500">
-                  Tombol status hanya mengizinkan transisi berikutnya yang valid sesuai aturan server.
+                  Pilih salah satu pesanan untuk mengubah status atau memverifikasi bukti pembayaran.
                 </p>
 
-                <div className="mt-4 overflow-x-auto">
+                {/* Kartu Mobile (Tampil rapi di HP) */}
+                <div className="mt-4 space-y-3 md:hidden">
+                  {orders.map((o) => (
+                    <div
+                      key={o.orderNumber}
+                      className="rounded-2xl border border-[#e4e0d8] bg-[#faf9f6] p-3.5 text-xs"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="tabular font-bold text-stone-900">{o.orderNumber}</span>
+                        <span
+                          className={cn(
+                            "rounded-full border px-2.5 py-0.5 text-[10px] font-semibold",
+                            statusBadgeClass(o.status),
+                          )}
+                        >
+                          {statusLabelID(o.status, o.orderType)}
+                        </span>
+                      </div>
+                      <p className="mt-1 font-medium text-stone-800">
+                        {o.customerName} · {o.orderType === "DINE_IN" ? "Dine In" : "Take Away"}
+                      </p>
+                      <div className="mt-2.5 flex items-center justify-between border-t border-[#e4e0d8] pt-2.5">
+                        <div>
+                          <span className="tabular font-bold text-stone-900">{rupiah(o.total)}</span>
+                          <span className="ml-2 text-[10px] text-stone-500">({o.paymentStatus})</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedOrder(o)}
+                          className="rounded-full bg-[#1c1612] px-3.5 py-1.5 text-[11px] font-semibold text-white"
+                        >
+                          Kelola Pesanan
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Tabel Desktop */}
+                <div className="mt-4 hidden overflow-x-auto md:block">
                   <table className="w-full text-left text-xs">
                     <thead className="border-y border-[#e4e0d8] bg-[#f8f7f4] text-stone-600 uppercase">
                       <tr>
@@ -539,16 +704,28 @@ export default function AdminDashboardPage() {
                           <td className="tabular py-3 px-3 font-semibold">{o.orderNumber}</td>
                           <td className="py-3 px-3">
                             <p className="font-medium text-stone-900">{o.customerName}</p>
-                            <p className="tabular text-stone-500">{o.orderType === "DINE_IN" ? "Dine In" : "Take Away"}</p>
+                            <p className="tabular text-stone-500">
+                              {o.orderType === "DINE_IN" ? "Dine In" : "Take Away"}
+                            </p>
                           </td>
                           <td className="tabular py-3 px-3 font-semibold">{rupiah(o.total)}</td>
                           <td className="py-3 px-3">
-                            <span className={cn("border px-2 py-0.5 text-[10px] font-semibold rounded", statusBadgeClass(o.paymentStatus))}>
+                            <span
+                              className={cn(
+                                "rounded-full border px-2 py-0.5 text-[10px] font-semibold",
+                                statusBadgeClass(o.paymentStatus),
+                              )}
+                            >
                               {o.paymentStatus}
                             </span>
                           </td>
                           <td className="py-3 px-3">
-                            <span className={cn("border px-2 py-0.5 text-[10px] font-semibold rounded", statusBadgeClass(o.status))}>
+                            <span
+                              className={cn(
+                                "rounded-full border px-2 py-0.5 text-[10px] font-semibold",
+                                statusBadgeClass(o.status),
+                              )}
+                            >
                               {statusLabelID(o.status, o.orderType)}
                             </span>
                           </td>
@@ -556,7 +733,7 @@ export default function AdminDashboardPage() {
                             <button
                               type="button"
                               onClick={() => setSelectedOrder(o)}
-                              className="rounded border border-stone-300 bg-white px-2.5 py-1 font-semibold hover:bg-stone-100"
+                              className="rounded-full border border-stone-300 bg-white px-3 py-1 font-semibold hover:bg-stone-100"
                             >
                               Kelola
                             </button>
@@ -568,8 +745,8 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
 
-              {/* Panel Samping Detail Pesanan & Verifikasi Bukti */}
-              <div className="rounded border border-[#e4e0d8] bg-white p-5 lg:col-span-5">
+              {/* Panel Detail Pesanan & Verifikasi Bukti */}
+              <div className="rounded-2xl border border-[#e4e0d8] bg-white p-4 sm:p-5 lg:col-span-5">
                 {selectedOrder ? (
                   <div>
                     <div className="flex items-center justify-between border-b border-[#e4e0d8] pb-3">
@@ -582,7 +759,7 @@ export default function AdminDashboardPage() {
                       <button
                         type="button"
                         onClick={() => setSelectedOrder(null)}
-                        className="rounded p-1 hover:bg-stone-100"
+                        className="rounded-full p-1.5 hover:bg-stone-100"
                       >
                         <X size={16} />
                       </button>
@@ -602,7 +779,7 @@ export default function AdminDashboardPage() {
                         </span>
                       </div>
                       <div className="border-t border-[#e4e0d8] pt-3">
-                        <p className="font-semibold text-stone-700 mb-2">Rincian Item (Snapshot Harga):</p>
+                        <p className="mb-2 font-semibold text-stone-700">Rincian Item (Snapshot Harga):</p>
                         {selectedOrder.items.map((item) => (
                           <div key={item.productId} className="flex justify-between py-1">
                             <span>
@@ -611,23 +788,22 @@ export default function AdminDashboardPage() {
                             <span className="tabular font-medium">{rupiah(item.price * item.qty)}</span>
                           </div>
                         ))}
-                        <div className="mt-2 flex justify-between border-t border-[#e4e0d8] pt-2 font-bold text-sm">
+                        <div className="mt-2 flex justify-between border-t border-[#e4e0d8] pt-2 text-sm font-bold">
                           <span>Total</span>
                           <span className="tabular">{rupiah(selectedOrder.total)}</span>
                         </div>
                       </div>
 
-                      {/* Transisi Status Pesanan */}
                       <div className="border-t border-[#e4e0d8] pt-4">
                         <p className="font-semibold text-stone-700">
                           Status Saat Ini: {statusLabelID(selectedOrder.status, selectedOrder.orderType)}
                         </p>
-                        <p className="text-[11px] text-stone-500 mt-0.5">
+                        <p className="mt-0.5 text-[11px] text-stone-500">
                           Pilih status berikutnya yang diizinkan:
                         </p>
                         <div className="mt-2 flex flex-wrap gap-2">
                           {VALID_NEXT_ORDER_STATUS[selectedOrder.status].length === 0 ? (
-                            <span className="text-stone-400 italic">Status bersifat final.</span>
+                            <span className="italic text-stone-400">Status bersifat final.</span>
                           ) : (
                             VALID_NEXT_ORDER_STATUS[selectedOrder.status].map((nextSt) => (
                               <button
@@ -638,7 +814,7 @@ export default function AdminDashboardPage() {
                                   setSelectedOrder({ ...selectedOrder, status: nextSt });
                                 }}
                                 className={cn(
-                                  "rounded px-3 py-1.5 text-xs font-semibold text-white",
+                                  "rounded-full px-3.5 py-1.5 text-xs font-semibold text-white",
                                   nextSt === "CANCELLED"
                                     ? "bg-rose-600 hover:bg-rose-700"
                                     : "bg-[#1c1612] hover:bg-stone-800",
@@ -651,7 +827,6 @@ export default function AdminDashboardPage() {
                         </div>
                       </div>
 
-                      {/* Verifikasi Pembayaran */}
                       <div className="border-t border-[#e4e0d8] pt-4">
                         <p className="font-semibold text-stone-700">
                           Verifikasi Pembayaran ({selectedOrder.paymentMethod})
@@ -667,20 +842,20 @@ export default function AdminDashboardPage() {
                                 updatePaymentStatus(selectedOrder.orderNumber, "PAID");
                                 setSelectedOrder({ ...selectedOrder, paymentStatus: "PAID" });
                               }}
-                              className="inline-flex items-center gap-1 rounded bg-emerald-700 px-3 py-1.5 font-semibold text-white hover:bg-emerald-800"
+                              className="inline-flex items-center gap-1 rounded-full bg-emerald-700 px-3.5 py-1.5 font-semibold text-white hover:bg-emerald-800"
                             >
                               <Check size={14} /> Tandai Lunas
                             </button>
                           )}
                           {selectedOrder.paymentMethod === "BANK_TRANSFER" &&
                             selectedOrder.paymentStatus !== "REJECTED" && (
-                              <div className="flex w-full gap-2 mt-2">
+                              <div className="mt-2 flex w-full flex-col gap-2 sm:flex-row">
                                 <input
                                   type="text"
                                   value={rejectReasonInput}
                                   onChange={(e) => setRejectReasonInput(e.target.value)}
                                   placeholder="Alasan penolakan bukti (wajib)…"
-                                  className="flex-1 rounded border border-[#e4e0d8] px-2.5 py-1 text-xs"
+                                  className="flex-1 rounded-xl border border-[#e4e0d8] px-3 py-2 text-xs"
                                 />
                                 <button
                                   type="button"
@@ -698,7 +873,7 @@ export default function AdminDashboardPage() {
                                     });
                                     setRejectReasonInput("");
                                   }}
-                                  className="rounded bg-rose-600 px-3 py-1 font-semibold text-white hover:bg-rose-700"
+                                  className="rounded-full bg-rose-600 px-4 py-2 font-semibold text-white hover:bg-rose-700"
                                 >
                                   Tolak Bukti
                                 </button>
@@ -709,8 +884,8 @@ export default function AdminDashboardPage() {
                     </div>
                   </div>
                 ) : (
-                  <div className="grid h-64 place-items-center text-center text-xs text-stone-400">
-                    Pilih salah satu pesanan di tabel untuk memverifikasi pembayaran atau mengubah status pesanan.
+                  <div className="grid h-48 place-items-center text-center text-xs text-stone-400">
+                    Pilih salah satu pesanan untuk memverifikasi pembayaran atau mengubah status pesanan.
                   </div>
                 )}
               </div>
@@ -719,97 +894,87 @@ export default function AdminDashboardPage() {
 
           {/* 3. MANAJEMEN RESERVASI */}
           {tab === "reservasi" && (
-            <div className="rounded border border-[#e4e0d8] bg-white p-5">
+            <div className="rounded-2xl border border-[#e4e0d8] bg-white p-4 sm:p-5">
               <h2 className="text-base font-semibold text-stone-900">Manajemen Reservasi Meja</h2>
               <p className="text-xs text-stone-500">
                 Konfirmasi manual oleh admin dan kirim pesan WhatsApp langsung ke pelanggan.
               </p>
 
-              <div className="mt-4 overflow-x-auto">
-                <table className="w-full text-left text-xs">
-                  <thead className="border-y border-[#e4e0d8] bg-[#f8f7f4] text-stone-600 uppercase">
-                    <tr>
-                      <th className="py-2.5 px-3">No. Reservasi</th>
-                      <th className="py-2.5 px-3">Pelanggan</th>
-                      <th className="py-2.5 px-3">Jadwal</th>
-                      <th className="py-2.5 px-3">Tamu</th>
-                      <th className="py-2.5 px-3">Status</th>
-                      <th className="py-2.5 px-3">Aksi Konfirmasi</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#e4e0d8]">
-                    {reservations.map((r) => (
-                      <tr key={r.reservationNumber}>
-                        <td className="tabular py-3 px-3 font-semibold">{r.reservationNumber}</td>
-                        <td className="py-3 px-3">
-                          <p className="font-medium text-stone-900">{r.customerName}</p>
-                          <p className="tabular text-stone-500">{r.customerPhone}</p>
-                        </td>
-                        <td className="tabular py-3 px-3">
-                          {r.visitDate} · {r.visitTime} WIB
-                        </td>
-                        <td className="tabular py-3 px-3">{r.guestCount} org</td>
-                        <td className="py-3 px-3">
-                          <span className={cn("border px-2 py-0.5 text-[10px] font-semibold rounded", statusBadgeClass(r.status))}>
-                            {r.status}
-                          </span>
-                        </td>
-                        <td className="py-3 px-3">
-                          <div className="flex flex-wrap gap-1.5">
-                            {r.status === "PENDING" && (
-                              <>
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    updateReservationStatus(
-                                      r.reservationNumber,
-                                      "CONFIRMED",
-                                      "Meja telah disiapkan sesuai jadwal.",
-                                    )
-                                  }
-                                  className="rounded bg-emerald-700 px-2.5 py-1 font-semibold text-white hover:bg-emerald-800"
-                                >
-                                  Konfirmasi
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    updateReservationStatus(
-                                      r.reservationNumber,
-                                      "REJECTED",
-                                      "Kapasitas meja pada jam tersebut sudah penuh.",
-                                    )
-                                  }
-                                  className="rounded bg-rose-600 px-2.5 py-1 font-semibold text-white hover:bg-rose-700"
-                                >
-                                  Tolak
-                                </button>
-                              </>
-                            )}
-                            <a
-                              href={`https://wa.me/${r.customerPhone}?text=${encodeURIComponent(
-                                `Halo ${r.customerName}, status reservasi Anda (${r.reservationNumber}) di ${siteConfig.name} pada ${r.visitDate} pukul ${r.visitTime} WIB kini: ${r.status}.`,
-                              )}`}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="rounded border border-[#e4e0d8] px-2.5 py-1 font-medium hover:bg-stone-100"
-                            >
-                              Kirim WA
-                            </a>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                {reservations.map((r) => (
+                  <div
+                    key={r.reservationNumber}
+                    className="rounded-2xl border border-[#e4e0d8] bg-[#faf9f6] p-4 text-xs"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="tabular font-bold text-stone-900">{r.reservationNumber}</span>
+                      <span
+                        className={cn(
+                          "rounded-full border px-2.5 py-0.5 text-[10px] font-semibold",
+                          statusBadgeClass(r.status),
+                        )}
+                      >
+                        {r.status}
+                      </span>
+                    </div>
+                    <p className="mt-1.5 text-sm font-semibold text-stone-900">{r.customerName}</p>
+                    <p className="tabular text-stone-600">
+                      WA: {r.customerPhone} · {r.visitDate} ({r.visitTime} WIB) · {r.guestCount} tamu
+                    </p>
+                    {r.note && <p className="mt-1.5 italic text-stone-500">“{r.note}”</p>}
+
+                    <div className="mt-3 flex flex-wrap gap-2 border-t border-[#e4e0d8] pt-3">
+                      {r.status === "PENDING" && (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              updateReservationStatus(
+                                r.reservationNumber,
+                                "CONFIRMED",
+                                "Meja telah disiapkan sesuai jadwal.",
+                              )
+                            }
+                            className="rounded-full bg-emerald-700 px-3 py-1.5 font-semibold text-white hover:bg-emerald-800"
+                          >
+                            Konfirmasi Meja
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              updateReservationStatus(
+                                r.reservationNumber,
+                                "REJECTED",
+                                "Kapasitas meja pada jam tersebut sudah penuh.",
+                              )
+                            }
+                            className="rounded-full bg-rose-600 px-3 py-1.5 font-semibold text-white hover:bg-rose-700"
+                          >
+                            Tolak
+                          </button>
+                        </>
+                      )}
+                      <a
+                        href={`https://wa.me/${r.customerPhone}?text=${encodeURIComponent(
+                          `Halo ${r.customerName}, status reservasi Anda (${r.reservationNumber}) di ${siteConfig.name} Ponorogo pada ${r.visitDate} pukul ${r.visitTime} WIB kini: ${r.status}.`,
+                        )}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="rounded-full border border-[#e4e0d8] bg-white px-3 py-1.5 font-semibold hover:bg-stone-100"
+                      >
+                        Kirim WA
+                      </a>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           )}
 
           {/* 4. MANAJEMEN MENU */}
           {tab === "menu" && (
-            <div className="rounded border border-[#e4e0d8] bg-white p-5">
-              <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="rounded-2xl border border-[#e4e0d8] bg-white p-4 sm:p-5">
+              <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <h2 className="text-base font-semibold text-stone-900">Manajemen Menu</h2>
                   <p className="text-xs text-stone-500">
@@ -819,7 +984,7 @@ export default function AdminDashboardPage() {
                 <button
                   type="button"
                   onClick={() => setNewMenuOpen((v) => !v)}
-                  className="inline-flex items-center gap-1.5 rounded bg-[#1c1612] px-3.5 py-2 text-xs font-semibold text-white hover:bg-stone-800"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-[#1c1612] px-4 py-2 text-xs font-semibold text-white hover:bg-stone-800"
                 >
                   <Plus size={14} /> Tambah Menu Baru
                 </button>
@@ -828,7 +993,7 @@ export default function AdminDashboardPage() {
               {newMenuOpen && (
                 <form
                   onSubmit={handleAddMenu}
-                  className="mt-4 grid gap-3 rounded border border-[#e4e0d8] bg-[#f8f7f4] p-4 text-xs sm:grid-cols-4"
+                  className="mt-4 grid gap-3 rounded-2xl border border-[#e4e0d8] bg-[#f8f7f4] p-4 text-xs sm:grid-cols-4"
                 >
                   <input
                     type="text"
@@ -836,7 +1001,7 @@ export default function AdminDashboardPage() {
                     value={newName}
                     onChange={(e) => setNewName(e.target.value)}
                     placeholder="Nama menu (contoh: Piccolo Latte)"
-                    className="rounded border border-[#e4e0d8] bg-white px-3 py-2"
+                    className="rounded-xl border border-[#e4e0d8] bg-white px-3 py-2"
                   />
                   <input
                     type="number"
@@ -844,12 +1009,12 @@ export default function AdminDashboardPage() {
                     value={newPrice}
                     onChange={(e) => setNewPrice(Number(e.target.value))}
                     placeholder="Harga Rupiah"
-                    className="tabular rounded border border-[#e4e0d8] bg-white px-3 py-2"
+                    className="tabular rounded-xl border border-[#e4e0d8] bg-white px-3 py-2"
                   />
                   <select
                     value={newCat}
                     onChange={(e) => setNewCat(e.target.value)}
-                    className="rounded border border-[#e4e0d8] bg-white px-3 py-2"
+                    className="rounded-xl border border-[#e4e0d8] bg-white px-3 py-2"
                   >
                     {categoryList.map((c) => (
                       <option key={c.slug} value={c.slug}>
@@ -859,56 +1024,52 @@ export default function AdminDashboardPage() {
                   </select>
                   <button
                     type="submit"
-                    className="rounded bg-emerald-700 px-4 py-2 font-semibold text-white hover:bg-emerald-800"
+                    className="rounded-full bg-emerald-700 px-4 py-2 font-semibold text-white hover:bg-emerald-800"
                   >
                     Simpan Menu
                   </button>
                 </form>
               )}
 
-              <div className="mt-4 overflow-x-auto">
-                <table className="w-full text-left text-xs">
-                  <thead className="border-y border-[#e4e0d8] bg-[#f8f7f4] text-stone-600 uppercase">
-                    <tr>
-                      <th className="py-2.5 px-3">Nama Produk</th>
-                      <th className="py-2.5 px-3">Kategori</th>
-                      <th className="py-2.5 px-3">Harga</th>
-                      <th className="py-2.5 px-3">Badge</th>
-                      <th className="py-2.5 px-3">Status Tersedia</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#e4e0d8]">
-                    {menuItems.map((m) => (
-                      <tr key={m.id}>
-                        <td className="py-3 px-3 font-semibold text-stone-900">{m.name}</td>
-                        <td className="py-3 px-3 capitalize">{m.category}</td>
-                        <td className="tabular py-3 px-3 font-medium">{rupiah(m.price)}</td>
-                        <td className="py-3 px-3">{m.badge ?? "—"}</td>
-                        <td className="py-3 px-3">
-                          <button
-                            type="button"
-                            onClick={() => toggleProductAvailable(m.id)}
-                            className={cn(
-                              "rounded border px-2.5 py-1 text-[11px] font-semibold transition-colors",
-                              m.available
-                                ? "border-emerald-300 bg-emerald-100 text-emerald-800"
-                                : "border-rose-300 bg-rose-100 text-rose-800",
-                            )}
-                          >
-                            {m.available ? "Tersedia (Klik untuk Habiskan)" : "Habis (Klik untuk Aktifkan)"}
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {menuItems.map((m) => (
+                  <div
+                    key={m.id}
+                    className="flex flex-col justify-between rounded-2xl border border-[#e4e0d8] bg-[#faf9f6] p-4 text-xs"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-[10px] font-bold tracking-wider text-stone-400 uppercase">
+                          {m.category}
+                        </span>
+                        <span className="tabular font-bold text-stone-900">{rupiah(m.price)}</span>
+                      </div>
+                      <p className="mt-1 text-sm font-semibold text-stone-900">{m.name}</p>
+                    </div>
+                    <div className="mt-3 flex items-center justify-between border-t border-[#e4e0d8] pt-3">
+                      <span className="text-[11px] text-stone-500">{m.badge ?? "Tanpa Badge"}</span>
+                      <button
+                        type="button"
+                        onClick={() => toggleProductAvailable(m.id)}
+                        className={cn(
+                          "rounded-full border px-3 py-1 text-[11px] font-semibold transition-colors",
+                          m.available
+                            ? "border-emerald-300 bg-emerald-100 text-emerald-800"
+                            : "border-rose-300 bg-rose-100 text-rose-800",
+                        )}
+                      >
+                        {m.available ? "Tersedia" : "Habis"}
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           )}
 
           {/* 5. MANAJEMEN KATEGORI */}
           {tab === "kategori" && (
-            <div className="rounded border border-[#e4e0d8] bg-white p-5">
+            <div className="rounded-2xl border border-[#e4e0d8] bg-white p-4 sm:p-5">
               <h2 className="text-base font-semibold text-stone-900">Manajemen Kategori</h2>
               <p className="text-xs text-stone-500">
                 Kategori yang masih memiliki produk tidak dapat dihapus permanen agar riwayat tetap utuh.
@@ -924,8 +1085,8 @@ export default function AdminDashboardPage() {
                         </span>
                         <span className="ml-2 text-stone-400">({c.slug})</span>
                       </div>
-                      <span className="rounded bg-stone-100 px-2.5 py-1 font-medium text-stone-700">
-                        Dipakai oleh {count} produk
+                      <span className="rounded-full bg-stone-100 px-3 py-1 font-medium text-stone-700">
+                        {count} produk
                       </span>
                     </div>
                   );
@@ -936,19 +1097,19 @@ export default function AdminDashboardPage() {
 
           {/* 6, 7, 8. GALERI, TESTIMONI, TENTANG KAMI */}
           {(tab === "galeri" || tab === "testimoni" || tab === "tentang") && (
-            <div className="rounded border border-[#e4e0d8] bg-white p-5">
+            <div className="rounded-2xl border border-[#e4e0d8] bg-white p-4 sm:p-5">
               <h2 className="text-base font-semibold text-stone-900 capitalize">Modul {tab}</h2>
-              <p className="text-xs text-stone-500 mt-1">
+              <p className="mt-1 text-xs text-stone-500">
                 Seluruh item yang ditandai <strong>Published</strong> tampil otomatis di website publik.
               </p>
 
               {tab === "galeri" && (
                 <div className="mt-4 grid gap-3 sm:grid-cols-3 text-xs">
                   {gallery.map((g) => (
-                    <div key={g.id} className="rounded border border-[#e4e0d8] p-3">
+                    <div key={g.id} className="rounded-2xl border border-[#e4e0d8] p-3.5">
                       <p className="font-semibold">{g.title}</p>
-                      <p className="text-stone-500 mt-0.5">Alt: {g.alt}</p>
-                      <span className="mt-2 inline-block rounded bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-800 uppercase">
+                      <p className="mt-0.5 text-stone-500">Alt: {g.alt}</p>
+                      <span className="mt-2 inline-block rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-semibold text-emerald-800 uppercase">
                         Published · {g.category}
                       </span>
                     </div>
@@ -959,12 +1120,14 @@ export default function AdminDashboardPage() {
               {tab === "testimoni" && (
                 <div className="mt-4 divide-y divide-[#e4e0d8] text-xs">
                   {testimonialList.map((t, i) => (
-                    <div key={i} className="py-3 flex justify-between gap-4">
+                    <div key={i} className="flex justify-between gap-4 py-3">
                       <div>
-                        <p className="font-semibold">{t.name} ({t.rating}★)</p>
-                        <p className="text-stone-600 mt-0.5">{t.text}</p>
+                        <p className="font-semibold">
+                          {t.name} ({t.rating}★)
+                        </p>
+                        <p className="mt-0.5 text-stone-600">{t.text}</p>
                       </div>
-                      <span className="self-start rounded bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-800">
+                      <span className="self-start rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-semibold text-emerald-800">
                         Tampil
                       </span>
                     </div>
@@ -975,11 +1138,11 @@ export default function AdminDashboardPage() {
               {tab === "tentang" && (
                 <div className="mt-4 space-y-3 text-xs">
                   {aboutList.map((a, i) => (
-                    <div key={i} className="rounded border border-[#e4e0d8] p-4">
-                      <span className="rounded bg-stone-100 px-2 py-0.5 text-[10px] font-semibold">
+                    <div key={i} className="rounded-2xl border border-[#e4e0d8] p-4">
+                      <span className="rounded-full bg-stone-100 px-2.5 py-0.5 text-[10px] font-semibold">
                         Tipe: {a.type}
                       </span>
-                      <p className="mt-1.5 font-semibold text-sm">{a.title}</p>
+                      <p className="mt-1.5 text-sm font-semibold">{a.title}</p>
                       <p className="mt-1 text-stone-600">{a.body.join(" ")}</p>
                     </div>
                   ))}
@@ -990,26 +1153,26 @@ export default function AdminDashboardPage() {
 
           {/* 9. PENGATURAN WEBSITE (MULTI-TAB) */}
           {tab === "pengaturan" && (
-            <div className="rounded border border-[#e4e0d8] bg-white p-5">
-              <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#e4e0d8] pb-4">
+            <div className="rounded-2xl border border-[#e4e0d8] bg-white p-4 sm:p-5">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#e4e0d8] pb-4">
                 <div>
                   <h2 className="text-base font-semibold text-stone-900">
                     Pengaturan Website (White-Label Multi-Client)
                   </h2>
                   <p className="text-xs text-stone-500">
-                    Perubahan identitas, warna utama, dan modul langsung diterapkan ke website publik tanpa mengubah kode.
+                    Perubahan identitas, warna utama, dan modul langsung diterapkan ke website publik.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={resetSiteConfig}
-                  className="rounded border border-[#e4e0d8] px-3 py-1.5 text-xs font-medium hover:bg-stone-100"
+                  className="rounded-full border border-[#e4e0d8] px-3.5 py-1.5 text-xs font-medium hover:bg-stone-100"
                 >
-                  Reset ke Default Prajalinks
+                  Reset ke Default
                 </button>
               </div>
 
-              <div className="mt-4 flex flex-wrap gap-1.5 border-b border-[#e4e0d8] pb-3 text-xs">
+              <div className="no-scrollbar mt-4 flex gap-1.5 overflow-x-auto border-b border-[#e4e0d8] pb-3 text-xs">
                 {(
                   [
                     ["identitas", "Identitas & Hero"],
@@ -1017,8 +1180,8 @@ export default function AdminDashboardPage() {
                     ["kontak", "Kontak & Lokasi"],
                     ["operasional", "Jam Operasional"],
                     ["modul", "Modul Fitur"],
-                    ["pembayaran", "Rekening Pembayaran"],
-                    ["seo", "SEO & OpenGraph"],
+                    ["pembayaran", "Rekening"],
+                    ["seo", "SEO"],
                   ] as const
                 ).map(([key, label]) => (
                   <button
@@ -1026,7 +1189,7 @@ export default function AdminDashboardPage() {
                     type="button"
                     onClick={() => setSettingsSubTab(key)}
                     className={cn(
-                      "rounded px-3 py-1.5 font-semibold transition-colors",
+                      "shrink-0 rounded-full px-3.5 py-1.5 font-semibold transition-colors",
                       settingsSubTab === key
                         ? "bg-[#1c1612] text-white"
                         : "bg-stone-100 text-stone-700 hover:bg-stone-200",
@@ -1046,7 +1209,7 @@ export default function AdminDashboardPage() {
                         type="text"
                         value={siteConfig.name}
                         onChange={(e) => updateSiteConfig({ name: e.target.value })}
-                        className="mt-1 w-full rounded border border-[#e4e0d8] px-3 py-2"
+                        className="mt-1 w-full rounded-xl border border-[#e4e0d8] px-3 py-2"
                       />
                     </div>
                     <div>
@@ -1055,7 +1218,7 @@ export default function AdminDashboardPage() {
                         type="text"
                         value={siteConfig.tagline}
                         onChange={(e) => updateSiteConfig({ tagline: e.target.value })}
-                        className="mt-1 w-full rounded border border-[#e4e0d8] px-3 py-2"
+                        className="mt-1 w-full rounded-xl border border-[#e4e0d8] px-3 py-2"
                       />
                     </div>
                     <div>
@@ -1068,54 +1231,52 @@ export default function AdminDashboardPage() {
                             hero: { ...siteConfig.hero, headline: e.target.value },
                           })
                         }
-                        className="mt-1 w-full rounded border border-[#e4e0d8] px-3 py-2"
+                        className="mt-1 w-full rounded-xl border border-[#e4e0d8] px-3 py-2"
                       />
                     </div>
                   </>
                 )}
 
                 {settingsSubTab === "tampilan" && (
-                  <>
-                    <div>
-                      <label className="block font-semibold text-stone-700">
-                        Warna Aksen Utama (Hex CSS Variable `--brand`)
-                      </label>
-                      <div className="mt-2 flex items-center gap-3">
-                        <input
-                          type="color"
-                          value={siteConfig.primaryColor}
-                          onChange={(e) => updateSiteConfig({ primaryColor: e.target.value })}
-                          className="h-10 w-16 cursor-pointer rounded border border-[#e4e0d8]"
-                        />
-                        <input
-                          type="text"
-                          value={siteConfig.primaryColor}
-                          onChange={(e) => updateSiteConfig({ primaryColor: e.target.value })}
-                          className="tabular rounded border border-[#e4e0d8] px-3 py-2 uppercase"
-                        />
-                      </div>
+                  <div>
+                    <label className="block font-semibold text-stone-700">
+                      Warna Aksen Utama (Hex CSS Variable `--brand`)
+                    </label>
+                    <div className="mt-2 flex items-center gap-3">
+                      <input
+                        type="color"
+                        value={siteConfig.primaryColor}
+                        onChange={(e) => updateSiteConfig({ primaryColor: e.target.value })}
+                        className="h-10 w-16 cursor-pointer rounded-xl border border-[#e4e0d8]"
+                      />
+                      <input
+                        type="text"
+                        value={siteConfig.primaryColor}
+                        onChange={(e) => updateSiteConfig({ primaryColor: e.target.value })}
+                        className="tabular rounded-xl border border-[#e4e0d8] px-3 py-2 uppercase"
+                      />
                     </div>
-                  </>
+                  </div>
                 )}
 
                 {settingsSubTab === "kontak" && (
                   <>
                     <div>
-                      <label className="block font-semibold text-stone-700">Alamat Lengkap</label>
+                      <label className="block font-semibold text-stone-700">Alamat Lengkap Ponorogo</label>
                       <input
                         type="text"
                         value={siteConfig.address}
                         onChange={(e) => updateSiteConfig({ address: e.target.value })}
-                        className="mt-1 w-full rounded border border-[#e4e0d8] px-3 py-2"
+                        className="mt-1 w-full rounded-xl border border-[#e4e0d8] px-3 py-2"
                       />
                     </div>
                     <div>
-                      <label className="block font-semibold text-stone-700">Nomor WhatsApp (Format 628…)</label>
+                      <label className="block font-semibold text-stone-700">Nomor WhatsApp</label>
                       <input
                         type="text"
                         value={siteConfig.whatsapp}
                         onChange={(e) => updateSiteConfig({ whatsapp: e.target.value })}
-                        className="tabular mt-1 w-full rounded border border-[#e4e0d8] px-3 py-2"
+                        className="tabular mt-1 w-full rounded-xl border border-[#e4e0d8] px-3 py-2"
                       />
                     </div>
                   </>
@@ -1144,7 +1305,7 @@ export default function AdminDashboardPage() {
                         ["testimonialEnabled", "Modul Testimoni Pelanggan"],
                       ] as const
                     ).map(([k, label]) => (
-                      <label key={k} className="flex items-center gap-2.5 rounded border border-[#e4e0d8] p-3">
+                      <label key={k} className="flex items-center gap-2.5 rounded-xl border border-[#e4e0d8] p-3">
                         <input
                           type="checkbox"
                           checked={siteConfig.features[k]}
@@ -1170,7 +1331,7 @@ export default function AdminDashboardPage() {
                         onChange={(e) =>
                           updateSiteConfig({ payment: { ...siteConfig.payment, bank: e.target.value } })
                         }
-                        className="mt-1 w-full rounded border border-[#e4e0d8] px-3 py-2"
+                        className="mt-1 w-full rounded-xl border border-[#e4e0d8] px-3 py-2"
                       />
                     </div>
                     <div>
@@ -1181,7 +1342,7 @@ export default function AdminDashboardPage() {
                         onChange={(e) =>
                           updateSiteConfig({ payment: { ...siteConfig.payment, number: e.target.value } })
                         }
-                        className="tabular mt-1 w-full rounded border border-[#e4e0d8] px-3 py-2"
+                        className="tabular mt-1 w-full rounded-xl border border-[#e4e0d8] px-3 py-2"
                       />
                     </div>
                   </div>
@@ -1194,7 +1355,7 @@ export default function AdminDashboardPage() {
                       rows={3}
                       value={siteConfig.description}
                       onChange={(e) => updateSiteConfig({ description: e.target.value })}
-                      className="mt-1 w-full rounded border border-[#e4e0d8] px-3 py-2"
+                      className="mt-1 w-full rounded-xl border border-[#e4e0d8] px-3 py-2"
                     />
                   </div>
                 )}
@@ -1202,6 +1363,39 @@ export default function AdminDashboardPage() {
             </div>
           )}
         </main>
+
+        {/* Bottom Navigation Bar untuk Admin Mobile */}
+        <nav
+          aria-label="Navigasi Cepat Admin Mobile"
+          className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 border-t border-[#e4e0d8] bg-white/95 py-1.5 backdrop-blur-md lg:hidden"
+        >
+          {(
+            [
+              { id: "dashboard", label: "Ringkasan", icon: LayoutDashboard },
+              { id: "pesanan", label: "Pesanan", icon: ShoppingBag, badge: pendingOrdersCount },
+              { id: "reservasi", label: "Reservasi", icon: CalendarCheck, badge: pendingResCount },
+              { id: "menu", label: "Menu", icon: Coffee },
+              { id: "pengaturan", label: "Tema", icon: Settings },
+            ] as const
+          ).map((item) => {
+            const Icon = item.icon;
+            const active = tab === item.id;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => setTab(item.id)}
+                className={cn(
+                  "relative flex flex-col items-center justify-center gap-0.5 py-1 text-[10px] font-semibold",
+                  active ? "text-[#1c1612]" : "text-stone-400",
+                )}
+              >
+                <Icon size={17} strokeWidth={active ? 2.2 : 1.6} />
+                <span>{item.label}</span>
+              </button>
+            );
+          })}
+        </nav>
       </div>
     </div>
   );

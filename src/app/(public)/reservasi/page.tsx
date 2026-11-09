@@ -281,7 +281,7 @@ export default function ReservasiPage() {
                       required
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      placeholder="Contoh: 081234567890"
+                      placeholder="Contoh: 085151951806"
                       className="field tabular"
                     />
                   </div>

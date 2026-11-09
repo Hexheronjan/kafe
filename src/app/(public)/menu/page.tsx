@@ -48,8 +48,8 @@ function MenuContent() {
 
   return (
     <>
-      {/* Filter Kategori & Pencarian Modern (Disimpan di URL ?kategori=...&q=...) */}
-      <div className="sticky top-[84px] z-30 py-3">
+      {/* Filter Kategori & Pencarian (Diam di atas katalog, tidak menutupi kartu saat di-scroll) */}
+      <div className="py-2">
         <div className="container-x">
           <div className="flex flex-col gap-3 rounded-3xl border border-espresso/10 bg-cream/90 p-3 shadow-[0_12px_32px_-16px_rgba(28,22,18,0.14)] backdrop-blur-xl md:flex-row md:items-center md:justify-between">
             <div

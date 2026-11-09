@@ -29,6 +29,9 @@ export function Navbar() {
   }, [pathname]);
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [open]);
 
   const overHero = pathname === "/" && !scrolled && !open;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -33,7 +33,7 @@ const DEMO_ACCOUNTS: {
     name: "Hendrawan · Owner",
     email: "owner@prajalinks.id",
     pass: "PrajalinksPonorogo2026!",
-    desc: "Akses penuh: laporan pendapatan, menu, pesanan, reservasi & kustomisasi tema website.",
+    desc: "Akses penuh: laporan pendapatan, menu, pesanan, reservasi & pengaturan tema website.",
   },
   {
     role: "ADMIN",
@@ -62,6 +62,12 @@ export function AdminLoginView({ onSuccess }: { onSuccess?: () => void }) {
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  // Pastikan body & html scroll tidak terkunci saat halaman login dibuka di mobile
+  useEffect(() => {
+    document.body.style.overflow = "";
+    document.documentElement.style.overflow = "";
+  }, []);
+
   const selectPreset = (acc: (typeof DEMO_ACCOUNTS)[number]) => {
     setSelectedRole(acc.role);
     setEmail(acc.email);
@@ -87,9 +93,9 @@ export function AdminLoginView({ onSuccess }: { onSuccess?: () => void }) {
   const activeAccount = DEMO_ACCOUNTS.find((a) => a.role === selectedRole) ?? DEMO_ACCOUNTS[0];
 
   return (
-    <div className="admin min-h-dvh lg:grid lg:grid-cols-12">
-      {/* Banner Visual Mobile (Hanya muncul di Mobile/Tablet agar tampilan tetap mewah) */}
-      <div className="relative overflow-hidden bg-[#1c1612] px-5 pt-5 pb-12 text-[#f6f0e7] lg:hidden">
+    <div className="admin min-h-dvh w-full lg:grid lg:grid-cols-12">
+      {/* Banner Visual Mobile */}
+      <div className="relative overflow-hidden bg-[#1c1612] px-5 pt-4 pb-10 text-[#f6f0e7] lg:hidden">
         <Image
           src="/images/hero.jpg"
           alt={siteConfig.name}
@@ -119,14 +125,14 @@ export function AdminLoginView({ onSuccess }: { onSuccess?: () => void }) {
           </Link>
         </div>
 
-        <div className="relative z-10 mt-6">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[10px] font-semibold tracking-wider uppercase backdrop-blur-md">
+        <div className="relative z-10 mt-4">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-0.5 text-[10px] font-semibold tracking-wider uppercase backdrop-blur-md">
             <Sparkles size={11} className="text-brand" /> Portal Pengelola · Ponorogo
           </span>
-          <h1 className="font-display mt-2.5 text-2xl leading-snug sm:text-3xl">
+          <h1 className="font-display mt-2 text-2xl leading-snug">
             Login Dashboard {siteConfig.name}
           </h1>
-          <p className="mt-1 text-xs text-white/75">
+          <p className="mt-0.5 text-xs text-white/75">
             Pilih akun role di bawah (otomatis terisi) lalu tekan Masuk.
           </p>
         </div>
@@ -181,8 +187,8 @@ export function AdminLoginView({ onSuccess }: { onSuccess?: () => void }) {
         </div>
       </div>
 
-      {/* Kolom Kanan: Kartu Login Otomatis Terisi (Responsif Mobile & Desktop) */}
-      <div className=" -mt-6 px-4 pb-10 sm:px-8 lg:col-span-7 lg:mt-0 lg:grid lg:place-items-center lg:p-10">
+      {/* Kolom Kanan: Kartu Login Otomatis Terisi */}
+      <div className="-mt-5 px-4 pb-14 sm:px-8 lg:col-span-7 lg:mt-0 lg:grid lg:place-items-center lg:p-10">
         <div className="relative z-20 mx-auto w-full max-w-lg rounded-3xl border border-[#e4e0d8] bg-white p-5 shadow-[0_20px_50px_-20px_rgba(28,22,18,0.16)] sm:p-8">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-[11px] font-semibold text-emerald-800">
@@ -200,12 +206,12 @@ export function AdminLoginView({ onSuccess }: { onSuccess?: () => void }) {
             </p>
           </div>
 
-          {/* Pemilih Role Responsif (1 kolom rapi di mobile, 3 kolom di tablet/desktop) */}
+          {/* Pemilih Role Responsif */}
           <div className="mt-4">
             <p className="text-[11px] font-bold tracking-wider text-stone-500 uppercase">
               1. Pilih Akun Role (Auto-Fill):
             </p>
-            <div className="mt-2.5 grid grid-cols-1 gap-2 sm:grid-cols-3">
+            <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-3">
               {DEMO_ACCOUNTS.map((acc) => {
                 const active = selectedRole === acc.role;
                 return (
@@ -214,13 +220,13 @@ export function AdminLoginView({ onSuccess }: { onSuccess?: () => void }) {
                     type="button"
                     onClick={() => selectPreset(acc)}
                     className={cn(
-                      "flex items-center justify-between rounded-2xl border p-3 text-left transition-all sm:flex-col sm:items-start sm:justify-start",
+                      "flex items-center justify-between rounded-2xl border px-3.5 py-2.5 text-left transition-all sm:flex-col sm:items-start sm:justify-start sm:p-3",
                       active
                         ? "border-[#1c1612] bg-[#1c1612] text-white shadow-md"
                         : "border-[#e4e0d8] bg-[#f8f7f4] text-stone-800 hover:bg-stone-100",
                     )}
                   >
-                    <div className="flex items-center gap-2.5 sm:w-full sm:justify-between">
+                    <div className="flex items-center gap-2 sm:w-full sm:justify-between">
                       <span
                         className={cn(
                           "rounded-full px-2.5 py-0.5 text-[10px] font-bold tracking-wider uppercase",
@@ -229,7 +235,7 @@ export function AdminLoginView({ onSuccess }: { onSuccess?: () => void }) {
                       >
                         {acc.role}
                       </span>
-                      <UserCheck size={15} className={active ? "text-brand" : "text-stone-400"} />
+                      <UserCheck size={14} className={active ? "text-brand" : "text-stone-400"} />
                     </div>
                     <div className="text-right sm:mt-2 sm:text-left">
                       <p className="text-xs font-bold leading-snug">{acc.label}</p>
@@ -250,7 +256,7 @@ export function AdminLoginView({ onSuccess }: { onSuccess?: () => void }) {
             </div>
           </div>
 
-          <form onSubmit={handleLogin} className="mt-5 space-y-4 text-xs">
+          <form onSubmit={handleLogin} className="mt-4 space-y-3.5 text-xs">
             <p className="text-[11px] font-bold tracking-wider text-stone-500 uppercase">
               2. Kredensial Terisi Otomatis:
             </p>
@@ -258,7 +264,7 @@ export function AdminLoginView({ onSuccess }: { onSuccess?: () => void }) {
               <label htmlFor="adm-email" className="block font-semibold text-stone-700">
                 Email Admin
               </label>
-              <div className="relative mt-1.5">
+              <div className="relative mt-1">
                 <Mail size={15} className="absolute top-1/2 left-3.5 -translate-y-1/2 text-stone-400" />
                 <input
                   id="adm-email"
@@ -275,7 +281,7 @@ export function AdminLoginView({ onSuccess }: { onSuccess?: () => void }) {
               <label htmlFor="adm-pass" className="block font-semibold text-stone-700">
                 Password
               </label>
-              <div className="relative mt-1.5">
+              <div className="relative mt-1">
                 <Lock size={15} className="absolute top-1/2 left-3.5 -translate-y-1/2 text-stone-400" />
                 <input
                   id="adm-pass"

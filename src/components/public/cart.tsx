@@ -109,7 +109,10 @@ function CartDrawer() {
     document.body.style.overflow = open ? "hidden" : "";
     const k = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
     window.addEventListener("keydown", k);
-    return () => window.removeEventListener("keydown", k);
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", k);
+    };
   }, [open, setOpen]);
 
   return (

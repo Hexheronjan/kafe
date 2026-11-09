@@ -117,7 +117,7 @@ export default function HomePage() {
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(184,115,58,0.25),transparent_55%)]" />
         </motion.div>
 
-        <div className="container-x relative z-10 pt-24 pb-10 md:pt-32 md:pb-20">
+        <div className="container-x relative z-10 pt-24 pb-16 md:pt-32 md:pb-20">
           {/* Floating status & location pills */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}

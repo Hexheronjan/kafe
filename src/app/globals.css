@@ -26,6 +26,8 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
+  width: 100%;
 }
 @media (prefers-reduced-motion: reduce) {
   html {
@@ -38,7 +40,9 @@ body {
   color: var(--espresso);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
-  overflow-x: clip;
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
 }
 
 ::selection {
@@ -194,7 +198,14 @@ body {
     transform 0.35s var(--ease-out-expo),
     box-shadow 0.35s var(--ease-out-expo);
   cursor: pointer;
-  white-space: nowrap;
+  max-width: 100%;
+  text-align: center;
+}
+@media (max-width: 640px) {
+  .btn {
+    padding-inline: 1rem;
+    white-space: normal;
+  }
 }
 .btn:hover:not(:disabled) {
   transform: translateY(-1px);

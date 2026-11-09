@@ -126,7 +126,7 @@ export default function ReservasiPage() {
         <div className="container-x grid gap-10 lg:grid-cols-12">
           {/* Kolom Informasi */}
           <Reveal className="lg:col-span-4">
-            <div className="rounded-3xl border border-espresso/10 bg-white/80 p-7 shadow-sm">
+            <div className="rounded-3xl border border-espresso/10 bg-white/80 p-5 shadow-sm sm:p-7">
               <p className="eyebrow">Ketentuan Reservasi</p>
               <h2 className="font-display mt-2 text-2xl">Sebelum Anda Memesan</h2>
               <ul className="mt-5 space-y-4 text-sm leading-relaxed text-mocha">
@@ -162,7 +162,7 @@ export default function ReservasiPage() {
           {/* Kolom Formulir / Konfirmasi */}
           <div className="lg:col-span-8">
             {created ? (
-              <div className="rounded-3xl border border-espresso/10 bg-white/85 p-8 shadow-md md:p-10">
+              <div className="rounded-3xl border border-espresso/10 bg-white/85 p-5 shadow-md sm:p-8 md:p-10">
                 <div className="inline-flex items-center gap-2 rounded-full bg-[#e8dcc2] px-3.5 py-1.5 text-xs font-semibold tracking-wider text-[#6e4f1d] uppercase">
                   <CheckCircle2 size={14} /> Status: Menunggu Konfirmasi
                 </div>
@@ -231,7 +231,7 @@ export default function ReservasiPage() {
               <form
                 onSubmit={validateAndSubmit}
                 noValidate
-                className="rounded-3xl border border-espresso/10 bg-white/85 p-7 shadow-md md:p-10"
+                className="rounded-3xl border border-espresso/10 bg-white/85 p-5 shadow-md sm:p-7 md:p-10"
               >
                 <p className="eyebrow">Formulir Reservasi</p>
                 <h2 className="font-display mt-2 text-3xl">Data Kunjungan</h2>

@@ -128,10 +128,10 @@ export function Footer() {
         </div>
 
         {/* Giant editorial wordmark */}
-        <div className="pt-10">
+        <div className="overflow-hidden pt-10">
           <p
             aria-hidden
-            className="font-display text-center text-[clamp(3.2rem,13vw,11.5rem)] leading-[0.86] tracking-tight text-cream/10 select-none"
+            className="font-display text-center text-[clamp(2.5rem,11vw,11.5rem)] leading-[0.86] tracking-tight text-cream/10 select-none"
           >
             {siteConfig.name.toUpperCase()}
           </p>

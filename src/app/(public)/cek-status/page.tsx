@@ -118,7 +118,7 @@ function CekStatusContent() {
             e.preventDefault();
             runLookup(code, phone);
           }}
-          className="rounded-3xl border border-espresso/10 bg-white/85 p-7 shadow-md md:p-9"
+          className="rounded-3xl border border-espresso/10 bg-white/85 p-5 shadow-md sm:p-7 md:p-9"
         >
           <p className="eyebrow">Verifikasi Nomor Transaksi & WhatsApp</p>
           <h2 className="font-display mt-2 text-2xl md:text-3xl">Masukkan Data Transaksi</h2>
@@ -203,7 +203,7 @@ function CekStatusContent() {
         )}
 
         {foundOrder && (
-          <div className="mt-8 rounded-3xl border border-espresso/10 bg-white/85 p-7 shadow-md md:p-9">
+          <div className="mt-8 rounded-3xl border border-espresso/10 bg-white/85 p-5 shadow-md sm:p-7 md:p-9">
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--line)] pb-5">
               <div>
                 <p className="eyebrow">Pesanan Online · {foundOrder.orderType === "DINE_IN" ? "Dine In" : "Take Away"}</p>
@@ -307,7 +307,7 @@ function CekStatusContent() {
         )}
 
         {foundRes && (
-          <div className="mt-8 rounded-3xl border border-espresso/10 bg-white/85 p-7 shadow-md md:p-9">
+          <div className="mt-8 rounded-3xl border border-espresso/10 bg-white/85 p-5 shadow-md sm:p-7 md:p-9">
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--line)] pb-5">
               <div>
                 <p className="eyebrow">Reservasi Meja · Ponorogo</p>

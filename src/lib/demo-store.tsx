@@ -179,8 +179,22 @@ export function DemoStoreProvider({ children }: { children: ReactNode }) {
       const savedSite = localStorage.getItem("prj-site-config-v3");
       // eslint-disable-next-line react-hooks/set-state-in-effect
       if (savedSite) setSiteConfig({ ...defaultSite, ...JSON.parse(savedSite) });
-      const savedMenu = localStorage.getItem("prj-menu-items-v3");
-      if (savedMenu) setMenuItems(JSON.parse(savedMenu));
+      const savedMenu =
+        localStorage.getItem("prj-menu-items-v4") ||
+        localStorage.getItem("prj-menu-items-v3");
+      if (savedMenu) {
+        const parsed = JSON.parse(savedMenu) as Product[];
+        const merged = defaultProducts.map((def) => {
+          const existing = parsed.find((p) => p.id === def.id);
+          if (!existing) return def;
+          return {
+            ...def,
+            ...existing,
+            image: existing.image || def.image,
+          };
+        });
+        setMenuItems(merged);
+      }
       const savedOrders = localStorage.getItem("prj-orders-v3");
       if (savedOrders) setOrders(JSON.parse(savedOrders));
       const savedRes = localStorage.getItem("prj-reservations-v3");
@@ -203,7 +217,7 @@ export function DemoStoreProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (hydrated) {
       try {
-        localStorage.setItem("prj-menu-items-v3", JSON.stringify(menuItems));
+        localStorage.setItem("prj-menu-items-v4", JSON.stringify(menuItems));
       } catch {}
     }
   }, [menuItems, hydrated]);

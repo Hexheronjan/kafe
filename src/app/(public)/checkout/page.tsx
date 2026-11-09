@@ -143,7 +143,7 @@ export default function CheckoutPage() {
       <section className="section pt-4">
         <div className="container-x">
           {createdOrder ? (
-            <div className="mx-auto max-w-3xl rounded-3xl border border-espresso/10 bg-white/85 p-7 shadow-lg md:p-10">
+            <div className="mx-auto max-w-3xl rounded-3xl border border-espresso/10 bg-white/85 p-4 shadow-lg sm:p-7 md:p-10">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <span className="inline-flex items-center gap-2 rounded-full bg-[#e8dcc2] px-3.5 py-1.5 text-xs font-semibold tracking-wider text-[#6e4f1d] uppercase">
                   <CheckCircle2 size={14} /> Status Pesanan: Menunggu Konfirmasi
@@ -271,11 +271,11 @@ export default function CheckoutPage() {
               </Link>
             </div>
           ) : (
-            <div className="grid gap-10 lg:grid-cols-12">
+            <div className="grid gap-8 lg:grid-cols-12 lg:gap-10">
               <form
                 onSubmit={handleCheckout}
                 noValidate
-                className="rounded-3xl border border-espresso/10 bg-white/85 p-7 shadow-md md:p-10 lg:col-span-7"
+                className="rounded-3xl border border-espresso/10 bg-white/85 p-4 shadow-md sm:p-7 md:p-10 lg:col-span-7"
               >
                 <p className="eyebrow">Langkah 1 · Data Pemesan</p>
                 <h2 className="font-display mt-2 text-3xl">Detail Pesanan</h2>
@@ -402,13 +402,16 @@ export default function CheckoutPage() {
                   </div>
                 </div>
 
-                <button type="submit" className="btn btn-primary mt-8 w-full">
+                <button
+                  type="submit"
+                  className="btn btn-primary mt-8 w-full !px-3 !py-3.5 whitespace-normal leading-snug"
+                >
                   Buat Pesanan Sekarang · {rupiah(total)}
                 </button>
               </form>
 
               <aside className="lg:col-span-5">
-                <div className="rounded-3xl border border-espresso/10 bg-white/80 p-7 shadow-sm">
+                <div className="rounded-3xl border border-espresso/10 bg-white/80 p-4 shadow-sm sm:p-7">
                   <p className="eyebrow">Langkah 2 · Ringkasan Harga</p>
                   <h2 className="font-display mt-2 text-2xl">Item di Keranjang</h2>
 
